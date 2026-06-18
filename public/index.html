@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Authorized Email Generator Prototype</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="workspace">
+        <header class="topbar">
+          <div>
+            <h1>Authorized Email Generator</h1>
+            <p>Team 3 capstone prototype for internal security awareness exercises.</p>
+          </div>
+          <a class="export-link" href="/api/logs.csv">Export CSV</a>
+        </header>
+
+        <div class="notice">
+          Authorized training use only. Generated links are safe demo links and must not be used for credential collection.
+        </div>
+
+        <div class="layout">
+          <form id="generatorForm" class="panel">
+            <h2>Training Scenario</h2>
+
+            <label>
+              Target profile
+              <input name="targetProfile" value="Finance employee" required>
+            </label>
+
+            <label>
+              Department
+              <input name="department" value="Finance" required>
+            </label>
+
+            <label>
+              Organization
+              <input name="organization" value="Example Corp">
+            </label>
+
+            <label>
+              Sender role
+              <input name="senderRole" value="Finance Operations">
+            </label>
+
+            <label>
+              Scenario context
+              <textarea name="scenarioContext" required>Recent reimbursement policy change</textarea>
+            </label>
+
+            <div class="controls">
+              <label>
+                Tone
+                <select name="tone" required>
+                  <option value="professional">Professional</option>
+                  <option value="urgent">Urgent</option>
+                  <option value="friendly">Friendly</option>
+                </select>
+              </label>
+
+              <label>
+                Deception intensity
+                <select name="intensity" required>
+                  <option value="low">Low</option>
+                  <option value="medium" selected>Medium</option>
+                  <option value="high">High</option>
+                </select>
+              </label>
+            </div>
+
+            <button type="submit">Generate Draft</button>
+          </form>
+
+          <section class="panel output-panel">
+            <h2>Generated Draft</h2>
+            <div id="status" class="status">Ready.</div>
+
+            <article id="result" class="result empty">
+              <p>Submit the form to generate a training email draft.</p>
+            </article>
+          </section>
+        </div>
+
+        <section class="panel logs-panel">
+          <div class="section-header">
+            <h2>Recent Logs</h2>
+            <button id="refreshLogs" type="button">Refresh</button>
+          </div>
+          <div id="logs" class="logs"></div>
+        </section>
+      </section>
+    </main>
+
+    <script src="/app.js"></script>
+  </body>
+</html>

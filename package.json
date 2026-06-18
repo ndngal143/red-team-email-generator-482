@@ -1,0 +1,22 @@
+{
+  "name": "red-team-email-generator-prototype",
+  "version": "0.1.0",
+  "description": "Initial prototype for an authorized red-team social engineering email generator capstone project.",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js",
+    "test": "node scripts/smoke-test.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "capstone",
+    "security-awareness",
+    "red-team",
+    "prototype"
+  ],
+  "license": "UNLICENSED",
+  "private": true
+}

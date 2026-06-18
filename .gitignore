@@ -1,0 +1,5 @@
+node_modules/
+.env
+data/*.jsonl
+*.log
+docx_render_check/
