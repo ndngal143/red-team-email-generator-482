@@ -167,3 +167,185 @@ Generated links should be training/demo links, not credential-harvesting pages. 
 | 7/17 | End-to-end testing review |
 | 7/24 | Final demo rehearsal |
 | 7/27–7/28 | Final presentation and demonstration |
+
+---
+
+## Prerequisites
+
+- Git
+- Node.js 20 or newer
+- A ChatGPT/OpenAI API key
+- PowerShell on Windows Server 2025 or Bash on Ubuntu 24.04 LTS
+
+The prototype has no npm package dependencies. It uses built-in Node.js modules and `fetch`.
+
+## Install Prerequisites
+
+### Windows Server 2025
+
+Install Git:
+
+```powershell
+winget install --id Git.Git -e
+```
+
+Install Node.js LTS:
+
+```powershell
+winget install --id OpenJS.NodeJS.LTS -e
+```
+
+Confirm installation:
+
+```powershell
+git --version
+node --version
+npm --version
+```
+
+### Ubuntu 24.04 LTS
+
+Install Git and Node.js:
+
+```bash
+sudo apt update
+sudo apt install -y git nodejs npm
+```
+
+If Ubuntu's default Node.js version is older than 20, install Node.js 20 LTS:
+
+```bash
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt install -y nodejs
+```
+
+Confirm installation:
+
+```bash
+git --version
+node --version
+npm --version
+```
+
+## Configure
+
+Create a local environment file from the example.
+
+Windows PowerShell:
+
+```powershell
+Copy-Item .env.example .env
+notepad .env
+```
+
+Ubuntu Bash:
+
+```bash
+cp .env.example .env
+nano .env
+```
+
+Set:
+
+```text
+OPENAI_API_KEY=your_api_key_here
+OPENAI_MODEL=gpt-5.4-mini
+PORT=3000
+DEMO_BASE_DOMAIN=training.example.internal
+```
+
+If your OpenAI account uses a different available model name, update `OPENAI_MODEL` in `.env`.
+
+## Run
+
+```bash
+npm start
+```
+
+Open:
+
+```text
+http://localhost:3000
+```
+
+The app still runs without an API key by using a local demo template. Add your API key to enable OpenAI-generated drafts.
+
+On Windows PowerShell, if `npm` is blocked by the script execution policy, use:
+
+```powershell
+npm.cmd start
+```
+
+## Smoke Test
+
+Run this to confirm the backend can start, generate a sample draft, create a safe training link, score spam indicators, and write a log entry:
+
+```bash
+npm test
+```
+
+Windows PowerShell fallback:
+
+```powershell
+npm.cmd test
+```
+
+## Deploy
+
+### Windows Server 2025 VM
+
+1. Install Git and Node.js.
+2. Clone or copy this project folder onto the server.
+3. Create `.env` from `.env.example`.
+4. Run:
+
+```powershell
+npm start
+```
+
+5. Allow inbound traffic for the selected port if accessing from another machine.
+
+```powershell
+New-NetFirewallRule -DisplayName "Capstone Prototype Port 3000" -Direction Inbound -Protocol TCP -LocalPort 3000 -Action Allow
+```
+
+### Ubuntu 24.04 LTS VM
+
+1. Install Git and Node.js.
+2. Clone or copy this project folder onto the server.
+3. Create `.env` from `.env.example`.
+4. Run:
+
+```bash
+npm start
+```
+
+5. Allow inbound traffic for the selected port if using UFW.
+
+```bash
+sudo ufw allow 3000/tcp
+```
+
+For a longer-running demo server, use a process manager such as `pm2` or a systemd service later in the project.
+
+## Project Structure
+
+```text
+src/server.js           Backend server and API routes
+src/generator.js        OpenAI integration and safe fallback generation
+src/linkGenerator.js    Safe internal-looking training link generator
+src/spamChecker.js      Simple spam indicator scoring
+src/logStore.js         JSONL log storage and export
+public/index.html       Prototype UI
+public/styles.css       UI styles
+public/app.js           Browser-side form logic
+docs/MILESTONE_TODOS.md Team TODOs organized by milestone
+data/.gitkeep           Log directory placeholder
+```
+
+## Safety Notes
+
+- Generated links use safe demo domains or local routes.
+- The prompt instructs the model to create training drafts only.
+- The prototype does not create credential collection pages.
+- Logs are local JSONL files intended for defensive analysis and export.
