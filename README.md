@@ -27,15 +27,15 @@ Generated links should be training/demo links, not credential-harvesting pages. 
 
 # Timeline Overview
 
-| Dates | Milestone |
-|---------|---------|
-| 6/15–6/19 | Milestone 1: Requirements, Architecture, and Project Setup |
-| 6/22–6/26 | Milestone 2: Form Design, Data Model, and Safety Controls |
-| 6/29–7/3 | Milestone 3: Email Generation Engine and Spam Indicator Checks |
-| 7/6–7/10 | Milestone 4: Link Generator, Logging, and Storage |
-| 7/13–7/17 | Milestone 5: Full Integration, Testing, and Defensive Dataset Export |
-| 7/20–7/24 | Milestone 6: Polish, Deployment, Documentation, and Demo Prep |
-| 7/27–7/28 | Final Presentation and Demonstration |
+| Completion | Dates | Milestone |
+|---------|---------|---------|
+| ☑ | 6/15–6/19 | Milestone 1: Requirements, Architecture, and Project Setup |
+| ☐ | 6/22–6/26 | Milestone 2: Form Design, Data Model, and Safety Controls |
+| ☐ | 6/29–7/3 | Milestone 3: Email Generation Engine and Spam Indicator Checks |
+| ☐ | 7/6–7/10 | Milestone 4: Link Generator, Logging, and Storage |
+| ☐ | 7/13–7/17 | Milestone 5: Full Integration, Testing, and Defensive Dataset Export |
+| ☐ | 7/20–7/24 | Milestone 6: Polish, Deployment, Documentation, and Demo Prep |
+| ☐ | 7/27–7/28 | Final Presentation and Demonstration |
 
 ---
 
@@ -45,11 +45,11 @@ Generated links should be training/demo links, not credential-harvesting pages. 
 
 **Goal:** Define the project clearly, set up the development environment, and create the technical foundation.
 
-| Member | Subtask | Outputs | Measurement |
-|---------|---------|---------|---------|
-| Joyce | Define user requirements and project use cases | Requirements document, user stories, feature list | At least 8 user stories; requirements reviewed by all 3 members; scope includes generator, tone controls, intensity controls, link generator, and logging |
-| Sebastian | Design system architecture | Architecture diagram, technology stack decision, data flow diagram | Architecture includes frontend, backend/API, LLM generation layer, URL generator, logging storage, and safety checks |
-| Alex | Set up repository and development environment | GitHub repository, initial folder structure, README, setup instructions | Repo runs locally; README includes install/run steps; all team members can clone and start the app |
+| Completion | Member | Subtask | Outputs | Measurement |
+|---------|---------|---------|---------|---------|
+| ☑ | Joyce | Define user requirements and project use cases | Requirements document, user stories, feature list | At least 8 user stories; requirements reviewed by all 3 members; scope includes generator, tone controls, intensity controls, link generator, and logging |
+| ☑ | Sebastian | Design system architecture | Architecture diagram, technology stack decision, data flow diagram | Architecture includes frontend, backend/API, LLM generation layer, URL generator, logging storage, and safety checks |
+| ☑ | Alex | Set up repository and development environment | GitHub repository, initial folder structure, README, setup instructions | Repo runs locally; README includes install/run steps; all team members can clone and start the app |
 
 ---
 
@@ -59,11 +59,11 @@ Generated links should be training/demo links, not credential-harvesting pages. 
 
 **Goal:** Build the user input workflow and define the structured data needed for generation and logging.
 
-| Member | Subtask | Outputs | Measurement |
-|---------|---------|---------|---------|
-| Joyce | Design web form fields and user workflow | Form wireframe, field list, validation rules | Form includes target profile, department, scenario context, tone, deception intensity, sender role, and organization details |
-| Sebastian | Create backend data model | Schema for generation requests, generated emails, generated links, and logs | Schema supports all required form fields; log entries include timestamp, inputs, generated output, spam score, and link metadata |
-| Alex | Define safety and authorization controls | Safety checklist, warning labels, allowed-use notice, blocked content rules | App displays authorized-use notice; generated content avoids credential collection instructions and real malicious payloads |
+| Completion | Member | Subtask | Outputs | Measurement |
+|---------|---------|---------|---------|---------|
+| ☐ | Joyce | Design web form fields and user workflow | Form wireframe, field list, validation rules | Form includes target profile, department, scenario context, tone, deception intensity, sender role, and organization details |
+| ☐ | Sebastian | Create backend data model | Schema for generation requests, generated emails, generated links, and logs | Schema supports all required form fields; log entries include timestamp, inputs, generated output, spam score, and link metadata |
+| ☐ | Alex | Define safety and authorization controls | Safety checklist, warning labels, allowed-use notice, blocked content rules | App displays authorized-use notice; generated content avoids credential collection instructions and real malicious payloads |
 
 ---
 
@@ -73,11 +73,11 @@ Generated links should be training/demo links, not credential-harvesting pages. 
 
 **Goal:** Implement the core email draft generator and basic anti-spam analysis.
 
-| Member | Subtask | Outputs | Measurement |
-|---------|---------|---------|---------|
-| Joyce | Create tone and intensity prompt templates | Prompt template set for urgent, professional, and friendly tones | Each tone produces clearly different wording; deception intensity changes subject line, urgency, and call-to-action strength |
-| Sebastian | Implement backend generation endpoint | API endpoint that accepts form data and returns generated email draft | Endpoint returns subject, sender name, body, call-to-action, and generated link placeholder within 5 seconds locally |
-| Alex | Build spam indicator checker | Spam keyword/risk scoring function and recommendations | Checker flags common spam indicators such as excessive urgency, suspicious wording, all-caps, too many exclamation points, and risky phrases |
+| Completion | Member | Subtask | Outputs | Measurement |
+|---------|---------|---------|---------|---------|
+| ☐ | Joyce | Create tone and intensity prompt templates | Prompt template set for urgent, professional, and friendly tones | Each tone produces clearly different wording; deception intensity changes subject line, urgency, and call-to-action strength |
+| ☐ | Sebastian | Implement backend generation endpoint | API endpoint that accepts form data and returns generated email draft | Endpoint returns subject, sender name, body, call-to-action, and generated link placeholder within 5 seconds locally |
+| ☐ | Alex | Build spam indicator checker | Spam keyword/risk scoring function and recommendations | Checker flags common spam indicators such as excessive urgency, suspicious wording, all-caps, too many exclamation points, and risky phrases |
 
 ---
 
@@ -87,11 +87,11 @@ Generated links should be training/demo links, not credential-harvesting pages. 
 
 **Goal:** Add realistic internal-looking training URLs and persistent logs for defensive analysis.
 
-| Member | Subtask | Outputs | Measurement |
-|---------|---------|---------|---------|
-| Joyce | Define internal-looking URL patterns | URL pattern list and sample generated links | At least 10 realistic training-safe URL formats, such as policy, HR, finance, IT, and benefits paths |
-| Sebastian | Implement link generator | Function/API that generates training URLs based on department and scenario | Generated links contain safe demo domains or local routes; no real credential capture URLs are produced |
-| Alex | Implement email logging | Log storage, generated email history view, exportable records | Every generation creates a log entry; logs can be viewed and exported as CSV or JSON |
+| Completion | Member | Subtask | Outputs | Measurement |
+|---------|---------|---------|---------|---------|
+| ☐ | Joyce | Define internal-looking URL patterns | URL pattern list and sample generated links | At least 10 realistic training-safe URL formats, such as policy, HR, finance, IT, and benefits paths |
+| ☐ | Sebastian | Implement link generator | Function/API that generates training URLs based on department and scenario | Generated links contain safe demo domains or local routes; no real credential capture URLs are produced |
+| ☐ | Alex | Implement email logging | Log storage, generated email history view, exportable records | Every generation creates a log entry; logs can be viewed and exported as CSV or JSON |
 
 ---
 
@@ -101,11 +101,11 @@ Generated links should be training/demo links, not credential-harvesting pages. 
 
 **Goal:** Connect all components, test the full workflow, and prepare logs for defensive model training.
 
-| Member | Subtask | Outputs | Measurement |
-|---------|---------|---------|---------|
-| Joyce | Conduct user workflow testing | Test cases, user feedback notes, revised UI checklist | At least 10 test scenarios covering different departments, tones, and intensity levels |
-| Sebastian | Integrate frontend, backend, generator, link generator, and logging | Working end-to-end application | User can submit form, generate email, receive spam check results, get generated URL, and see log entry |
-| Alex | Create defensive dataset export | CSV/JSON export format with labeled generated emails | Export includes email body, subject, tone, intensity, scenario, spam indicators, and generated link metadata |
+| Completion | Member | Subtask | Outputs | Measurement |
+|---------|---------|---------|---------|---------|
+| ☐ | Joyce | Conduct user workflow testing | Test cases, user feedback notes, revised UI checklist | At least 10 test scenarios covering different departments, tones, and intensity levels |
+| ☐ | Sebastian | Integrate frontend, backend, generator, link generator, and logging | Working end-to-end application | User can submit form, generate email, receive spam check results, get generated URL, and see log entry |
+| ☐ | Alex | Create defensive dataset export | CSV/JSON export format with labeled generated emails | Export includes email body, subject, tone, intensity, scenario, spam indicators, and generated link metadata |
 
 ---
 
@@ -115,11 +115,11 @@ Generated links should be training/demo links, not credential-harvesting pages. 
 
 **Goal:** Prepare the final working project for demonstration and presentation.
 
-| Member | Subtask | Outputs | Measurement |
-|---------|---------|---------|---------|
-| Joyce | Polish UI and prepare demo script | Final UI revisions, demo walkthrough script | Demo script covers form input, email generation, spam check, URL generation, and log export |
-| Sebastian | Prepare deployment or local demo environment | Deployed app or reliable local demo setup | App runs consistently on demo machine; setup time under 5 minutes |
-| Alex | Write final documentation and presentation content | Final README, project report sections, presentation slides outline | Documentation explains purpose, setup, features, safety limits, architecture, and testing results |
+| Completion | Member | Subtask | Outputs | Measurement |
+|---------|---------|---------|---------|---------|
+| ☐ | Joyce | Polish UI and prepare demo script | Final UI revisions, demo walkthrough script | Demo script covers form input, email generation, spam check, URL generation, and log export |
+| ☐ | Sebastian | Prepare deployment or local demo environment | Deployed app or reliable local demo setup | App runs consistently on demo machine; setup time under 5 minutes |
+| ☐ | Alex | Write final documentation and presentation content | Final README, project report sections, presentation slides outline | Documentation explains purpose, setup, features, safety limits, architecture, and testing results |
 
 ---
 
