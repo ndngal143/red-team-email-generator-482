@@ -1,245 +1,169 @@
-# Red Team Social Engineering Email Generator
+# Capstone Project Plan
 
-## Project Description
+| Field | Details |
+|---------|---------|
+| Course | CSC482 Capstone Project II |
+| Team | Team 3: Joyce, Sebastian, Alex |
+| Project Window | June 15, 2026 through July 24, 2026 |
+| Final Presentation/Demo | July 27–28, 2026 |
 
-This project is a web-based form generator for authorized red-team and security-awareness exercises. Users provide a target profile and contextual details, then the application generates a customized phishing email draft for internal training use.
+## Project Goal
 
-The tool includes adjustable deception intensity, tone controls, anti-spam indicator checks, realistic internal-looking URL generation, and generated email logs for defensive model training.
+Build a web-based form generator for authorized red-team security awareness exercises. Users enter a target profile and scenario context, choose tone and deception intensity, and receive a customized phishing-style training email draft.
 
-## Course Information
+The system will also include:
 
-CSC482 Capstone Project II  
-Summer Session: June 1 - July 28  
-Team: Capstone Project Team 3
+- Anti-spam indicator checks
+- Realistic internal-looking training URL generation
+- Generated email logs for defensive model training
 
-## Team Members
+## Safety and Scope
 
-- Alex
-- Joyce
-- Sebastian
+This project is for authorized internal awareness exercises only.
 
-## Team Member Descriptions
+Generated links should be training/demo links, not credential-harvesting pages. Logs should support defensive analysis and model training, not real-world abuse.
 
-### Alex
+---
 
-Add description here.
+# Timeline Overview
 
-### Joyce
+| Dates | Milestone |
+|---------|---------|
+| 6/15–6/19 | Milestone 1: Requirements, Architecture, and Project Setup |
+| 6/22–6/26 | Milestone 2: Form Design, Data Model, and Safety Controls |
+| 6/29–7/3 | Milestone 3: Email Generation Engine and Spam Indicator Checks |
+| 7/6–7/10 | Milestone 4: Link Generator, Logging, and Storage |
+| 7/13–7/17 | Milestone 5: Full Integration, Testing, and Defensive Dataset Export |
+| 7/20–7/24 | Milestone 6: Polish, Deployment, Documentation, and Demo Prep |
+| 7/27–7/28 | Final Presentation and Demonstration |
 
-Add description here.
+---
 
-### Sebastian
+# Milestone 1: Requirements, Architecture, and Project Setup
 
-Add description here.
+**Dates:** 6/15–6/19
 
-## Project Milestones
+**Goal:** Define the project clearly, set up the development environment, and create the technical foundation.
 
-| Milestone | Status | Target Date |
-|---|---|---|
-| Project topic selected | Achieved | Week 1 |
-| Development environment installed | Achieved | Week 2 |
-| Initial prototype created | To be achieved | Week 3 |
-| Email generator form completed | To be achieved | Week 4 |
-| Tone and deception controls completed | To be achieved | Week 5 |
-| Link generator completed | To be achieved | Week 6 |
-| Email logging completed | To be achieved | Week 7 |
-| Final testing and demo preparation | To be achieved | Week 8 |
+| Member | Subtask | Outputs | Measurement |
+|---------|---------|---------|---------|
+| Joyce | Define user requirements and project use cases | Requirements document, user stories, feature list | At least 8 user stories; requirements reviewed by all 3 members; scope includes generator, tone controls, intensity controls, link generator, and logging |
+| Sebastian | Design system architecture | Architecture diagram, technology stack decision, data flow diagram | Architecture includes frontend, backend/API, LLM generation layer, URL generator, logging storage, and safety checks |
+| Alex | Set up repository and development environment | GitHub repository, initial folder structure, README, setup instructions | Repo runs locally; README includes install/run steps; all team members can clone and start the app |
 
-## Weekly Tasks
+---
 
-| Week | Tasks | Status |
-|---|---|---|
-| Week 1 | Review syllabus, set up VMs, choose topic, form team | Complete |
-| Week 2 | Install Git, Python, Node.js, VS Code; create project plan | Complete |
-| Week 3 | Build initial prototype and repository structure | To be completed |
-| Week 4 | Build web form and basic email generation flow | To be completed |
-| Week 5 | Add tone and deception intensity settings | To be completed |
-| Week 6 | Add internal-looking link generator | To be completed |
-| Week 7 | Add generated email logs and defensive training dataset export | To be completed |
-| Week 8 | Test, polish, prepare final presentation and demo | To be completed |
+# Milestone 2: Form Design, Data Model, and Safety Controls
 
-# Red Team Social Engineering Email Generator Prototype
+**Dates:** 6/22–6/26
 
-Initial runnable prototype for Team 3's CSC482 Capstone Project II.
+**Goal:** Build the user input workflow and define the structured data needed for generation and logging.
 
-This app is for authorized internal security awareness exercises only. It generates training email drafts, safe demo links, spam-indicator feedback, and local JSONL logs for defensive review. No model training is required.
+| Member | Subtask | Outputs | Measurement |
+|---------|---------|---------|---------|
+| Joyce | Design web form fields and user workflow | Form wireframe, field list, validation rules | Form includes target profile, department, scenario context, tone, deception intensity, sender role, and organization details |
+| Sebastian | Create backend data model | Schema for generation requests, generated emails, generated links, and logs | Schema supports all required form fields; log entries include timestamp, inputs, generated output, spam score, and link metadata |
+| Alex | Define safety and authorization controls | Safety checklist, warning labels, allowed-use notice, blocked content rules | App displays authorized-use notice; generated content avoids credential collection instructions and real malicious payloads |
 
-## Prerequisites
+---
 
-- Git
-- Node.js 20 or newer
-- A ChatGPT/OpenAI API key
-- PowerShell on Windows Server 2025 or Bash on Ubuntu 24.04 LTS
+# Milestone 3: Email Generation Engine and Spam Indicator Checks
 
-The prototype has no npm package dependencies. It uses built-in Node.js modules and `fetch`.
+**Dates:** 6/29–7/3
 
-## Install Prerequisites
+**Goal:** Implement the core email draft generator and basic anti-spam analysis.
 
-### Windows Server 2025
+| Member | Subtask | Outputs | Measurement |
+|---------|---------|---------|---------|
+| Joyce | Create tone and intensity prompt templates | Prompt template set for urgent, professional, and friendly tones | Each tone produces clearly different wording; deception intensity changes subject line, urgency, and call-to-action strength |
+| Sebastian | Implement backend generation endpoint | API endpoint that accepts form data and returns generated email draft | Endpoint returns subject, sender name, body, call-to-action, and generated link placeholder within 5 seconds locally |
+| Alex | Build spam indicator checker | Spam keyword/risk scoring function and recommendations | Checker flags common spam indicators such as excessive urgency, suspicious wording, all-caps, too many exclamation points, and risky phrases |
 
-Install Git:
+---
 
-```powershell
-winget install --id Git.Git -e
-```
+# Milestone 4: Link Generator, Logging, and Storage
 
-Install Node.js LTS:
+**Dates:** 7/6–7/10
 
-```powershell
-winget install --id OpenJS.NodeJS.LTS -e
-```
+**Goal:** Add realistic internal-looking training URLs and persistent logs for defensive analysis.
 
-Confirm installation:
+| Member | Subtask | Outputs | Measurement |
+|---------|---------|---------|---------|
+| Joyce | Define internal-looking URL patterns | URL pattern list and sample generated links | At least 10 realistic training-safe URL formats, such as policy, HR, finance, IT, and benefits paths |
+| Sebastian | Implement link generator | Function/API that generates training URLs based on department and scenario | Generated links contain safe demo domains or local routes; no real credential capture URLs are produced |
+| Alex | Implement email logging | Log storage, generated email history view, exportable records | Every generation creates a log entry; logs can be viewed and exported as CSV or JSON |
 
-```powershell
-git --version
-node --version
-npm --version
-```
+---
 
-### Ubuntu 24.04 LTS
+# Milestone 5: Full Integration, Testing, and Defensive Dataset Export
 
-Install Git and Node.js:
+**Dates:** 7/13–7/17
 
-```bash
-sudo apt update
-sudo apt install -y git nodejs npm
-```
-
-If Ubuntu's default Node.js version is older than 20, install Node.js 20 LTS:
-
-```bash
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-sudo apt install -y nodejs
-```
-
-Confirm installation:
-
-```bash
-git --version
-node --version
-npm --version
-```
-
-## Configure
-
-Create a local environment file from the example.
-
-Windows PowerShell:
-
-```powershell
-Copy-Item .env.example .env
-notepad .env
-```
-
-Ubuntu Bash:
-
-```bash
-cp .env.example .env
-nano .env
-```
-
-Set:
-
-```text
-OPENAI_API_KEY=your_api_key_here
-OPENAI_MODEL=gpt-5.4-mini
-PORT=3000
-DEMO_BASE_DOMAIN=training.example.internal
-```
-
-If your OpenAI account uses a different available model name, update `OPENAI_MODEL` in `.env`.
-
-## Run
-
-```bash
-npm start
-```
-
-Open:
-
-```text
-http://localhost:3000
-```
-
-The app still runs without an API key by using a local demo template. Add your API key to enable OpenAI-generated drafts.
-
-On Windows PowerShell, if `npm` is blocked by the script execution policy, use:
-
-```powershell
-npm.cmd start
-```
-
-## Smoke Test
-
-Run this to confirm the backend can start, generate a sample draft, create a safe training link, score spam indicators, and write a log entry:
-
-```bash
-npm test
-```
-
-Windows PowerShell fallback:
-
-```powershell
-npm.cmd test
-```
-
-## Deploy
-
-### Windows Server 2025 VM
-
-1. Install Git and Node.js.
-2. Clone or copy this project folder onto the server.
-3. Create `.env` from `.env.example`.
-4. Run:
-
-```powershell
-npm start
-```
-
-5. Allow inbound traffic for the selected port if accessing from another machine.
-
-```powershell
-New-NetFirewallRule -DisplayName "Capstone Prototype Port 3000" -Direction Inbound -Protocol TCP -LocalPort 3000 -Action Allow
-```
-
-### Ubuntu 24.04 LTS VM
-
-1. Install Git and Node.js.
-2. Clone or copy this project folder onto the server.
-3. Create `.env` from `.env.example`.
-4. Run:
-
-```bash
-npm start
-```
-
-5. Allow inbound traffic for the selected port if using UFW.
-
-```bash
-sudo ufw allow 3000/tcp
-```
-
-For a longer-running demo server, use a process manager such as `pm2` or a systemd service later in the project.
-
-## Project Structure
-
-```text
-src/server.js           Backend server and API routes
-src/generator.js        OpenAI integration and safe fallback generation
-src/linkGenerator.js    Safe internal-looking training link generator
-src/spamChecker.js      Simple spam indicator scoring
-src/logStore.js         JSONL log storage and export
-public/index.html       Prototype UI
-public/styles.css       UI styles
-public/app.js           Browser-side form logic
-docs/MILESTONE_TODOS.md Team TODOs organized by milestone
-data/.gitkeep           Log directory placeholder
-```
-
-## Safety Notes
-
-- Generated links use safe demo domains or local routes.
-- The prompt instructs the model to create training drafts only.
-- The prototype does not create credential collection pages.
-- Logs are local JSONL files intended for defensive analysis and export.
+**Goal:** Connect all components, test the full workflow, and prepare logs for defensive model training.
+
+| Member | Subtask | Outputs | Measurement |
+|---------|---------|---------|---------|
+| Joyce | Conduct user workflow testing | Test cases, user feedback notes, revised UI checklist | At least 10 test scenarios covering different departments, tones, and intensity levels |
+| Sebastian | Integrate frontend, backend, generator, link generator, and logging | Working end-to-end application | User can submit form, generate email, receive spam check results, get generated URL, and see log entry |
+| Alex | Create defensive dataset export | CSV/JSON export format with labeled generated emails | Export includes email body, subject, tone, intensity, scenario, spam indicators, and generated link metadata |
+
+---
+
+# Milestone 6: Polish, Deployment, Documentation, and Demo Prep
+
+**Dates:** 7/20–7/24
+
+**Goal:** Prepare the final working project for demonstration and presentation.
+
+| Member | Subtask | Outputs | Measurement |
+|---------|---------|---------|---------|
+| Joyce | Polish UI and prepare demo script | Final UI revisions, demo walkthrough script | Demo script covers form input, email generation, spam check, URL generation, and log export |
+| Sebastian | Prepare deployment or local demo environment | Deployed app or reliable local demo setup | App runs consistently on demo machine; setup time under 5 minutes |
+| Alex | Write final documentation and presentation content | Final README, project report sections, presentation slides outline | Documentation explains purpose, setup, features, safety limits, architecture, and testing results |
+
+---
+
+# Final Presentation and Demonstration
+
+**Dates:** 7/27–7/28
+
+## Presentation Focus
+
+- Problem statement: why organizations need authorized phishing-awareness training
+- Project goal and scope
+- System architecture
+- Live demonstration of the web form generator
+- Demonstration of tone and deception intensity controls
+- Demonstration of anti-spam indicator checks
+- Demonstration of internal-looking training URL generation
+- Demonstration of generated email logs and defensive export
+- Lessons learned and future improvements
+
+## Final Demo Success Criteria
+
+| Demo Area | Measurement |
+|---------|---------|
+| Web form | All required fields accept and validate input |
+| Email generation | Produces complete email with subject, sender, body, and call-to-action |
+| Tone control | Urgent, professional, and friendly outputs are visibly different |
+| Intensity control | Low, medium, and high settings affect urgency and persuasion level |
+| Spam checker | Flags common risky indicators and provides a score/recommendations |
+| Link generator | Produces realistic but safe internal-looking training URLs |
+| Logging | Each generated email is saved with metadata |
+| Export | Logs export successfully as CSV or JSON |
+| Demo reliability | Full workflow completes without errors during presentation |
+
+---
+
+# Suggested Weekly Meeting Schedule
+
+| Date | Meeting Focus |
+|---------|---------|
+| 6/15 | Kickoff, assign roles, confirm tools |
+| 6/19 | Review requirements and architecture |
+| 6/26 | Review form design, data model, and safety rules |
+| 7/3 | Review generation engine and spam checker |
+| 7/10 | Review link generator and logs |
+| 7/17 | End-to-end testing review |
+| 7/24 | Final demo rehearsal |
+| 7/27–7/28 | Final presentation and demonstration |
