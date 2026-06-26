@@ -40,7 +40,7 @@ Dates: 6/29-7/3
 - TODO Sebastian: Harden the backend generation endpoint.
   - Output: `/api/generate` endpoint with validation and error handling.
   - Measurement: Endpoint returns subject, sender, body, call-to-action, generated link, and spam score.
-- TODO Alex: Expand spam indicator detection.
+- DONE Alex: Expand spam indicator detection.
   - Output: Keyword/risk scoring function and recommendations.
   - Measurement: Checker flags urgency, all-caps, excessive punctuation, risky phrases, and suspicious wording.
 

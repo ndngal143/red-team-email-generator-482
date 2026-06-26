@@ -1,57 +1,89 @@
-const riskyTerms = [
-  "urgent",
-  "immediately",
-  "act now",
-  "verify your account",
-  "password",
-  "limited time",
-  "click here",
-  "suspended",
-  "final notice",
-  "wire transfer",
+const ruleGroups = [
+  {
+    category: "Urgency",
+    weight: 12,
+    terms: ["urgent", "immediately", "act now", "final notice", "limited time", "today only"],
+    recommendation: "Reduce extreme urgency and use normal business timing.",
+  },
+  {
+    category: "Credential Risk",
+    weight: 20,
+    terms: ["verify your account", "password", "login now", "account suspended", "mfa code", "2fa code"],
+    recommendation: "Avoid credential-related language in training drafts.",
+  },
+  {
+    category: "Generic Click Prompt",
+    weight: 10,
+    terms: ["click here", "open this link", "use this link", "download now"],
+    recommendation: "Use specific internal context instead of generic click prompts.",
+  },
+  {
+    category: "Financial Pressure",
+    weight: 14,
+    terms: ["wire transfer", "payment overdue", "invoice attached", "bank details", "reimbursement issue"],
+    recommendation: "Keep finance wording specific, calm, and clearly tied to the training scenario.",
+  },
+  {
+    category: "Suspicious Wording",
+    weight: 10,
+    terms: ["do not share", "confidential action required", "avoid delay", "failure to respond"],
+    recommendation: "Remove secrecy or pressure-based wording.",
+  },
 ];
 
 function checkSpamIndicators({ subject = "", body = "" }) {
-  // TODO Milestone 3 / Alex: Replace this starter scoring with a more complete
-  // ruleset and test cases for false positives/false negatives.
   const text = `${subject}\n${body}`;
   const lower = text.toLowerCase();
   const indicators = [];
+  const recommendations = new Set();
+  let score = 0;
 
-  for (const term of riskyTerms) {
-    if (lower.includes(term)) indicators.push(`Contains risky phrase: "${term}"`);
+  for (const group of ruleGroups) {
+    const matches = group.terms.filter((term) => lower.includes(term));
+    if (matches.length) {
+      score += group.weight + Math.min(matches.length - 1, 3) * 4;
+      indicators.push(`${group.category}: ${matches.join(", ")}`);
+      recommendations.add(group.recommendation);
+    }
   }
 
   const exclamationCount = (text.match(/!/g) || []).length;
-  if (exclamationCount >= 3) indicators.push("Uses excessive exclamation points");
+  if (exclamationCount >= 3) {
+    score += 10 + exclamationCount;
+    indicators.push(`Formatting: excessive exclamation points (${exclamationCount})`);
+    recommendations.add("Keep punctuation professional and minimal.");
+  }
 
   const allCapsWords = text.match(/\b[A-Z]{4,}\b/g) || [];
-  if (allCapsWords.length >= 3) indicators.push("Uses multiple all-caps words");
+  if (allCapsWords.length >= 3) {
+    score += 12 + allCapsWords.length * 2;
+    indicators.push(`Formatting: multiple all-caps words (${allCapsWords.slice(0, 5).join(", ")})`);
+    recommendations.add("Use sentence case instead of all-caps emphasis.");
+  }
 
-  if (subject.length > 80) indicators.push("Subject line is longer than 80 characters");
-  if (body.length < 120) indicators.push("Body may be too short for a professional internal email");
+  if (subject.length > 80) {
+    score += 8;
+    indicators.push("Subject: longer than 80 characters");
+    recommendations.add("Shorten the subject line.");
+  }
 
-  const score = Math.min(100, indicators.length * 15 + exclamationCount * 3 + allCapsWords.length * 4);
-  const level = score >= 60 ? "High" : score >= 30 ? "Medium" : "Low";
+  if (body.length < 120) {
+    score += 8;
+    indicators.push("Structure: body may be too short for a realistic internal email");
+    recommendations.add("Add normal business context and a clear reason for the message.");
+  }
+
+  score = Math.min(100, score);
+  const level = score >= 70 ? "High" : score >= 20 ? "Medium" : "Low";
 
   return {
     score,
     level,
     indicators,
-    recommendations: buildRecommendations(indicators),
+    recommendations: recommendations.size
+      ? [...recommendations]
+      : ["No major spam indicators detected by the checker."],
   };
-}
-
-function buildRecommendations(indicators) {
-  if (indicators.length === 0) {
-    return ["No major spam indicators detected by the starter checker."];
-  }
-
-  return [
-    "Reduce extreme urgency and suspicious wording where possible.",
-    "Keep punctuation and capitalization professional.",
-    "Use clear internal context instead of generic click prompts.",
-  ];
 }
 
 module.exports = { checkSpamIndicators };
