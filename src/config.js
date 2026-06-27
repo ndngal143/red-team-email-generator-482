@@ -22,6 +22,6 @@ loadEnv();
 module.exports = {
   port: Number(process.env.PORT || 3000),
   openaiApiKey: process.env.OPENAI_API_KEY || "",
-  openaiModel: process.env.OPENAI_MODEL || "gpt-5.4-mini",
+  openaiModel: process.env.OPENAI_MODEL || "",
   demoBaseDomain: process.env.DEMO_BASE_DOMAIN || "training.example.internal",
 };

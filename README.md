@@ -249,12 +249,12 @@ Set:
 
 ```text
 OPENAI_API_KEY=your_api_key_here
-OPENAI_MODEL=gpt-5.4-nano-2026-03-17
+# Optional: leave OPENAI_MODEL unset to select an available model at runtime.
 PORT=3000
 DEMO_BASE_DOMAIN=training.example.internal
 ```
 
-If your OpenAI account uses a different available model name, update `OPENAI_MODEL` in `.env`.
+The app lists available OpenAI models at runtime when `OPENAI_MODEL` is not set, then uses the selected model for email generation. To force a specific model for testing, add `OPENAI_MODEL=model_id_here` to `.env`.
 
 ## Run
 

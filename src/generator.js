@@ -1,5 +1,7 @@
 const { openaiApiKey, openaiModel } = require("./config");
 
+let cachedOpenAIModel = null;
+
 function buildPrompt(input, trainingLink) {
   return [
     {
@@ -40,6 +42,7 @@ async function generateEmail(input, trainingLink) {
   }
 
   try {
+    const selectedModel = await resolveOpenAIModel();
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -47,7 +50,7 @@ async function generateEmail(input, trainingLink) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: openaiModel,
+        model: selectedModel,
         messages: buildPrompt(input, trainingLink),
         temperature: 0.7,
         response_format: { type: "json_object" },
@@ -62,10 +65,58 @@ async function generateEmail(input, trainingLink) {
     const payload = await response.json();
     const content = payload.choices?.[0]?.message?.content || "{}";
     const parsed = JSON.parse(content);
-    return normalizeEmail(parsed, input, trainingLink, `Generated with OpenAI model: ${openaiModel}`);
+    return normalizeEmail(parsed, input, trainingLink, `Generated with OpenAI model: ${selectedModel}`);
   } catch (error) {
     return fallbackEmail(input, trainingLink, `OpenAI generation error: ${error.message}`);
   }
+}
+
+async function resolveOpenAIModel() {
+  if (openaiModel) return openaiModel;
+  if (cachedOpenAIModel) return cachedOpenAIModel;
+
+  const response = await fetch("https://api.openai.com/v1/models", {
+    headers: {
+      Authorization: `Bearer ${openaiApiKey}`,
+    },
+  });
+
+  if (!response.ok) {
+    const detail = await response.text();
+    throw new Error(`Unable to list OpenAI models: ${response.status} ${detail.slice(0, 160)}`);
+  }
+
+  const payload = await response.json();
+  const modelIds = (payload.data || []).map((model) => model.id).filter(Boolean);
+  cachedOpenAIModel = selectModel(modelIds);
+
+  if (!cachedOpenAIModel) {
+    throw new Error("No OpenAI models were returned for this API key.");
+  }
+
+  return cachedOpenAIModel;
+}
+
+function selectModel(modelIds) {
+  const ignoredModelTerms = [
+    "audio",
+    "dall-e",
+    "embedding",
+    "image",
+    "moderation",
+    "realtime",
+    "speech",
+    "tts",
+    "transcribe",
+    "whisper",
+  ];
+
+  return (
+    modelIds.find((modelId) => {
+      const normalized = modelId.toLowerCase();
+      return normalized.startsWith("gpt") && !ignoredModelTerms.some((term) => normalized.includes(term));
+    }) || modelIds[0]
+  );
 }
 
 function normalizeEmail(email, input, trainingLink, note) {
@@ -103,4 +154,4 @@ function fallbackEmail(input, trainingLink, note) {
   };
 }
 
-module.exports = { generateEmail };
+module.exports = { generateEmail, resolveOpenAIModel, selectModel };
