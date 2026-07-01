@@ -132,26 +132,39 @@ function validateSafety(input) {
     input.organization,
     input.senderRole,
     input.scenarioContext,
-  ].join(" ").toLowerCase();
+  ]
+    .join(" ")
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\s+/g, " ");
 
-  const blockedTerms = [
-    "collect passwords",
-    "steal credentials",
-    "harvest credentials",
-    "mfa code",
-    "2fa code",
-    "bypass spam",
-    "bypass security",
-    "malware",
-    "payload",
-    "macro",
-    "keylogger",
-    "credential portal",
+  const blockedPatterns = [
+    {
+      label: "credential collection",
+      pattern: /\b(collect|capture|harvest|steal|grab|obtain)\b.{0,40}\b(password|passwords|credential|credentials|login|logins)\b/,
+    },
+    {
+      label: "MFA code collection",
+      pattern: /\b(collect|capture|harvest|steal|grab|obtain)\b.{0,40}\b(mfa|2fa|otp|code|codes|token|tokens)\b/,
+    },
+    {
+      label: "malicious payload",
+      pattern: /\b(malware|payload|keylogger|ransomware|trojan|macro)\b/,
+    },
+    {
+      label: "security bypass",
+      pattern: /\b(bypass|evade|avoid|disable)\b.{0,40}\b(spam|filter|security|defender|antivirus|detection)\b/,
+    },
+    {
+      label: "credential portal",
+      pattern: /\b(credential|login|password)\b.{0,40}\b(portal|page|form|site)\b/,
+    },
   ];
 
-  const matched = blockedTerms.find((term) => text.includes(term));
+  const matched = blockedPatterns.find((rule) => rule.pattern.test(text));
+
   if (matched) {
-    return `Blocked unsafe request content: ${matched}`;
+    return `Blocked unsafe request content: ${matched.label}`;
   }
 
   return "";
