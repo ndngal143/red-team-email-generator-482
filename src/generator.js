@@ -9,6 +9,7 @@ function buildPrompt(input, trainingLink) {
       content:
         "You generate email drafts only for authorized internal security awareness exercises. " +
         "Do not provide credential collection instructions, malware instructions, evasion steps, or real-world abuse guidance. " +
+        "If the user asks for credential collection, malware delivery, evasion, or real abuse, refuse by returning a safe training-focused alternative." +
         "Use the supplied safe training link only. Return JSON with subject, senderName, body, and callToAction.",
     },
     {
