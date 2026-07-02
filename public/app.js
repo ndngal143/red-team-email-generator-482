@@ -75,9 +75,21 @@ async function loadLogs() {
   logs.innerHTML = payload.logs.map((entry) => `
     <div class="log-row">
       <strong>${escapeHtml(entry.email.subject)}</strong>
-      <small>${escapeHtml(entry.timestamp)} | ${escapeHtml(entry.input.department)} | ${escapeHtml(entry.input.tone)} | score ${entry.spam.score}</small>
+      <small>${escapeHtml(formatTimestamp(entry.timestamp))} | ${escapeHtml(entry.input.department)} | ${escapeHtml(entry.input.tone)} | score ${entry.spam.score}</small>
     </div>
   `).join("");
+}
+
+function formatTimestamp(timestamp) {
+  return new Date(timestamp).toLocaleString("sv-SE", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  });
 }
 
 function escapeHtml(value) {
