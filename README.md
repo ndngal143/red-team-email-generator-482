@@ -31,7 +31,7 @@ Generated links should be training/demo links, not credential-harvesting pages. 
 |---------|---------|---------|
 | ☑ | 6/15–6/19 | Milestone 1: Requirements, Architecture, and Project Setup |
 | ☑ | 6/22–6/26 | Milestone 2: Form Design, Data Model, and Safety Controls |
-| ☐ | 6/29–7/3 | Milestone 3: Email Generation Engine and Spam Indicator Checks |
+| ☑ | 6/29–7/3 | Milestone 3: Email Generation Engine and Spam Indicator Checks |
 | ☐ | 7/6–7/10 | Milestone 4: Link Generator, Logging, and Storage |
 | ☐ | 7/13–7/17 | Milestone 5: Full Integration, Testing, and Defensive Dataset Export |
 | ☐ | 7/20–7/24 | Milestone 6: Polish, Deployment, Documentation, and Demo Prep |
