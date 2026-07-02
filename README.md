@@ -31,7 +31,7 @@ Generated links should be training/demo links, not credential-harvesting pages. 
 |---------|---------|---------|
 | ☑ | 6/15–6/19 | Milestone 1: Requirements, Architecture, and Project Setup |
 | ☑ | 6/22–6/26 | Milestone 2: Form Design, Data Model, and Safety Controls |
-| ☐ | 6/29–7/3 | Milestone 3: Email Generation Engine and Spam Indicator Checks |
+| ☑ | 6/29–7/3 | Milestone 3: Email Generation Engine and Spam Indicator Checks |
 | ☐ | 7/6–7/10 | Milestone 4: Link Generator, Logging, and Storage |
 | ☐ | 7/13–7/17 | Milestone 5: Full Integration, Testing, and Defensive Dataset Export |
 | ☐ | 7/20–7/24 | Milestone 6: Polish, Deployment, Documentation, and Demo Prep |
@@ -75,9 +75,9 @@ Generated links should be training/demo links, not credential-harvesting pages. 
 
 | Completion | Member | Subtask | Outputs | Measurement |
 |---------|---------|---------|---------|---------|
-| ☐ | Joyce | Create tone and intensity prompt templates | Prompt template set for urgent, professional, and friendly tones | Each tone produces clearly different wording; deception intensity changes subject line, urgency, and call-to-action strength |
+| ☑ | Joyce | Create tone and intensity prompt templates | Prompt template set for urgent, professional, and friendly tones | Each tone produces clearly different wording; deception intensity changes subject line, urgency, and call-to-action strength |
 | ☑ | Sebastian | Implement backend generation endpoint | API endpoint that accepts form data and returns generated email draft | Endpoint returns subject, sender name, body, call-to-action, and generated link placeholder within 5 seconds locally |
-| ☐ | Alex | Build spam indicator checker | Spam keyword/risk scoring function and recommendations | Checker flags common spam indicators such as excessive urgency, suspicious wording, all-caps, too many exclamation points, and risky phrases |
+| ☑ | Alex | Build spam indicator checker | Spam keyword/risk scoring function and recommendations | Checker flags common spam indicators such as excessive urgency, suspicious wording, all-caps, too many exclamation points, and risky phrases |
 
 ---
 
