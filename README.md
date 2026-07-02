@@ -75,7 +75,7 @@ Generated links should be training/demo links, not credential-harvesting pages. 
 
 | Completion | Member | Subtask | Outputs | Measurement |
 |---------|---------|---------|---------|---------|
-| ☐ | Joyce | Create tone and intensity prompt templates | Prompt template set for urgent, professional, and friendly tones | Each tone produces clearly different wording; deception intensity changes subject line, urgency, and call-to-action strength |
+| ☑ | Joyce | Create tone and intensity prompt templates | Prompt template set for urgent, professional, and friendly tones | Each tone produces clearly different wording; deception intensity changes subject line, urgency, and call-to-action strength |
 | ☑ | Sebastian | Implement backend generation endpoint | API endpoint that accepts form data and returns generated email draft | Endpoint returns subject, sender name, body, call-to-action, and generated link placeholder within 5 seconds locally |
 | ☑ | Alex | Build spam indicator checker | Spam keyword/risk scoring function and recommendations | Checker flags common spam indicators such as excessive urgency, suspicious wording, all-caps, too many exclamation points, and risky phrases |
 
