@@ -24,4 +24,7 @@ module.exports = {
   openaiApiKey: process.env.OPENAI_API_KEY || "",
   openaiModel: process.env.OPENAI_MODEL || "",
   demoBaseDomain: process.env.DEMO_BASE_DOMAIN || "training.example.internal",
+  trainingBaseUrl: process.env.TRAINING_BASE_URL || `http://localhost:${process.env.PORT || 3000}`,
+  feedbackEmailWebhookUrl: process.env.FEEDBACK_EMAIL_WEBHOOK_URL || "",
+  feedbackFromEmail: process.env.FEEDBACK_FROM_EMAIL || "security-awareness@example.internal",
 };

@@ -1,5 +1,5 @@
 const crypto = require("node:crypto");
-const { demoBaseDomain } = require("./config");
+const { demoBaseDomain, trainingBaseUrl } = require("./config");
 
 const departmentPaths = {
   finance: ["finance/reimbursements", "finance/policy-update", "payroll/verification"],
@@ -27,21 +27,33 @@ function pickDepartmentKey(department) {
 }
 
 function generateTrainingLink({ department, scenarioContext }) {
-  // TODO Milestone 4 / Sebastian: Replace this deterministic demo link with a richer
-  // pattern library and optional local route tracking.
   const key = pickDepartmentKey(department);
   const paths = departmentPaths[key];
   const path = paths[Math.floor(Math.random() * paths.length)];
   const scenario = normalize(scenarioContext) || "training-notice";
-  const token = crypto.randomBytes(4).toString("hex");
+  const token = crypto.randomBytes(16).toString("hex");
+  const baseUrl = normalizeBaseUrl(trainingBaseUrl);
+  const destinationPath = `/training/${path}/${scenario}`;
+  const destinationUrl = `${baseUrl}${destinationPath}?ref=awareness-${token.slice(0, 8)}`;
+  const trackingUrl = `${baseUrl}/r/${token}`;
 
   return {
-    url: `https://${demoBaseDomain}/${path}/${scenario}?ref=awareness-${token}`,
+    url: trackingUrl,
+    trackingUrl,
+    destinationUrl,
+    internalPreviewUrl: `https://${demoBaseDomain}/${path}/${scenario}?ref=awareness-${token.slice(0, 8)}`,
     domain: demoBaseDomain,
     path,
+    scenario,
     token,
     safeDemoOnly: true,
   };
+}
+
+function normalizeBaseUrl(value) {
+  return String(value || "")
+    .trim()
+    .replace(/\/+$/, "");
 }
 
 module.exports = { generateTrainingLink };
