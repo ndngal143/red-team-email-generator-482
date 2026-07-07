@@ -1,5 +1,6 @@
 const testPort = 3099;
 const baseUrl = `http://localhost:${testPort}`;
+process.env.EMAILGEN_SKIP_DOTENV = "1";
 process.env.TRAINING_BASE_URL = baseUrl;
 
 const { server } = require("../src/server");

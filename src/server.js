@@ -2,7 +2,7 @@ const http = require("node:http");
 const fs = require("node:fs");
 const path = require("node:path");
 const crypto = require("node:crypto");
-const { port } = require("./config");
+const { host, port } = require("./config");
 const { generateEmail } = require("./generator");
 const { generateTrainingLink } = require("./linkGenerator");
 const { checkSpamIndicators } = require("./spamChecker");
@@ -256,8 +256,11 @@ function serveStatic(req, res) {
 }
 
 if (require.main === module) {
-  server.listen(port, () => {
-    console.log(`Capstone prototype running at http://localhost:${port}`);
+  server.listen(port, host, () => {
+    console.log(`Capstone prototype running at http://${host}:${port}`);
+    if (host === "0.0.0.0" || host === "::") {
+      console.log(`Local URL: http://localhost:${port}`);
+    }
   });
 }
 

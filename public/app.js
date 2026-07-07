@@ -75,7 +75,7 @@ async function loadLogs() {
   logs.innerHTML = payload.logs.map((entry) => `
     <div class="log-row">
       <strong>${escapeHtml(entry.email.subject)}</strong>
-      <small>${escapeHtml(formatTimestamp(entry.timestamp))} | ${escapeHtml(entry.input.department)} | ${escapeHtml(entry.input.tone)} | score ${entry.spam.score}</small>
+      <small>${escapeHtml(formatTimestamp(entry.timestamp))} | ${escapeHtml(entry.input.department)} | ${escapeHtml(entry.input.tone)} | score ${entry.spam.score} | clicks ${entry.clickMetrics?.count || 0}${entry.clickMetrics?.lastClickedAt ? ` | last click ${escapeHtml(formatTimestamp(entry.clickMetrics.lastClickedAt))}` : ""}</small>
     </div>
   `).join("");
 }

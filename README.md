@@ -251,6 +251,7 @@ Set:
 OPENAI_API_KEY=your_api_key_here
 # Optional: leave OPENAI_MODEL unset to select an available model at runtime.
 PORT=3000
+HOST=0.0.0.0
 DEMO_BASE_DOMAIN=training.example.internal
 ```
 
@@ -267,6 +268,14 @@ Open:
 ```text
 http://localhost:3000
 ```
+
+To test from another computer on the same network, set `HOST=0.0.0.0` and set `TRAINING_BASE_URL` to the server machine's reachable address, for example:
+
+```text
+TRAINING_BASE_URL=http://192.168.1.25:3000
+```
+
+Then open that same URL from the other computer. If it does not load, confirm Windows Firewall allows inbound TCP traffic on the configured `PORT`.
 
 The app still runs without an API key by using a local demo template. Add your API key to enable OpenAI-generated drafts.
 

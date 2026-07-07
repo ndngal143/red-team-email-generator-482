@@ -2,6 +2,8 @@ const fs = require("node:fs");
 const path = require("node:path");
 
 function loadEnv() {
+  if (process.env.EMAILGEN_SKIP_DOTENV === "1") return;
+
   const envPath = path.join(process.cwd(), ".env");
   if (!fs.existsSync(envPath)) return;
 
@@ -21,6 +23,7 @@ loadEnv();
 
 module.exports = {
   port: Number(process.env.PORT || 3000),
+  host: process.env.HOST || "0.0.0.0",
   openaiApiKey: process.env.OPENAI_API_KEY || "",
   openaiModel: process.env.OPENAI_MODEL || "",
   demoBaseDomain: process.env.DEMO_BASE_DOMAIN || "training.example.internal",
