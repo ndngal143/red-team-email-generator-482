@@ -90,8 +90,8 @@ Generated links should be training/demo links, not credential-harvesting pages. 
 | Completion | Member | Subtask | Outputs | Measurement |
 |---------|---------|---------|---------|---------|
 | ☐ | Joyce | Define internal-looking URL patterns | URL pattern list and sample generated links | At least 10 realistic training-safe URL formats, such as policy, HR, finance, IT, and benefits paths |
-| ☐ | Sebastian | Implement link generator | Function/API that generates training URLs based on department and scenario | Generated links contain safe demo domains or local routes; no real credential capture URLs are produced |
-| ☐ | Alex | Implement email logging | Log storage, generated email history view, exportable records | Every generation creates a log entry; logs can be viewed and exported as CSV or JSON |
+| ☑ | Sebastian | Implement link generator | Function/API that generates training URLs based on department and scenario | Generated links contain safe demo domains or local routes; no real credential capture URLs are produced |
+| ☑ | Alex | Implement email logging | Log storage, generated email history view, exportable records | Every generation creates a log entry; logs can be viewed and exported as CSV or JSON |
 
 ---
 
