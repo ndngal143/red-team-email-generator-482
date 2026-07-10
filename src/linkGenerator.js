@@ -1,13 +1,106 @@
 const crypto = require("node:crypto");
 const { demoBaseDomain } = require("./config");
 
-const departmentPaths = {
-  finance: ["finance/reimbursements", "finance/policy-update", "payroll/verification"],
-  hr: ["hr/benefits", "people/policy-acknowledgement", "hr/forms"],
-  it: ["it/service-desk", "security/device-review", "it/account-notice"],
-  operations: ["operations/schedule", "ops/announcement", "facilities/access"],
-  default: ["portal/notice", "intranet/update", "training/awareness"],
-};
+const urlPatterns = [
+  {
+    id: "finance-reimbursement-review",
+    departmentKey: "finance",
+    label: "Finance reimbursement review",
+    pathTemplate: "finance/reimbursements/{scenario}",
+    queryTemplate: "ref=awareness-{token}",
+  },
+  {
+    id: "finance-policy-acknowledgement",
+    departmentKey: "finance",
+    label: "Finance policy acknowledgement",
+    pathTemplate: "finance/policies/{scenario}/acknowledge",
+    queryTemplate: "case=training-{token}",
+  },
+  {
+    id: "payroll-document-review",
+    departmentKey: "finance",
+    label: "Payroll document review",
+    pathTemplate: "payroll/documents/{scenario}",
+    queryTemplate: "notice=demo-{token}",
+  },
+  {
+    id: "hr-benefits-update",
+    departmentKey: "hr",
+    label: "HR benefits update",
+    pathTemplate: "hr/benefits/{scenario}",
+    queryTemplate: "ref=awareness-{token}",
+  },
+  {
+    id: "people-policy-acknowledgement",
+    departmentKey: "hr",
+    label: "People policy acknowledgement",
+    pathTemplate: "people/policies/{scenario}/review",
+    queryTemplate: "ticket=training-{token}",
+  },
+  {
+    id: "hr-forms-center",
+    departmentKey: "hr",
+    label: "HR forms center",
+    pathTemplate: "hr/forms/{scenario}",
+    queryTemplate: "source=demo-{token}",
+  },
+  {
+    id: "it-service-desk-ticket",
+    departmentKey: "it",
+    label: "IT service desk ticket",
+    pathTemplate: "it/service-desk/{scenario}",
+    queryTemplate: "ticket=awareness-{token}",
+  },
+  {
+    id: "security-device-review",
+    departmentKey: "it",
+    label: "Security device review",
+    pathTemplate: "security/device-review/{scenario}",
+    queryTemplate: "ref=training-{token}",
+  },
+  {
+    id: "account-notice-center",
+    departmentKey: "it",
+    label: "Account notice center",
+    pathTemplate: "it/account-notices/{scenario}",
+    queryTemplate: "notice=demo-{token}",
+  },
+  {
+    id: "operations-schedule-update",
+    departmentKey: "operations",
+    label: "Operations schedule update",
+    pathTemplate: "operations/schedules/{scenario}",
+    queryTemplate: "ref=awareness-{token}",
+  },
+  {
+    id: "facilities-access-review",
+    departmentKey: "operations",
+    label: "Facilities access review",
+    pathTemplate: "facilities/access/{scenario}",
+    queryTemplate: "case=training-{token}",
+  },
+  {
+    id: "intranet-policy-notice",
+    departmentKey: "default",
+    label: "Intranet policy notice",
+    pathTemplate: "intranet/policy-notices/{scenario}",
+    queryTemplate: "ref=awareness-{token}",
+  },
+  {
+    id: "portal-training-awareness",
+    departmentKey: "default",
+    label: "Portal training awareness",
+    pathTemplate: "portal/training/{scenario}",
+    queryTemplate: "session=demo-{token}",
+  },
+  {
+    id: "compliance-review-center",
+    departmentKey: "default",
+    label: "Compliance review center",
+    pathTemplate: "compliance/review/{scenario}",
+    queryTemplate: "case=awareness-{token}",
+  },
+];
 
 function normalize(value) {
   return String(value || "")
@@ -27,21 +120,53 @@ function pickDepartmentKey(department) {
 }
 
 function generateTrainingLink({ department, scenarioContext }) {
-  // TODO Milestone 4 / Sebastian: Replace this deterministic demo link with a richer
-  // pattern library and optional local route tracking.
   const key = pickDepartmentKey(department);
-  const paths = departmentPaths[key];
-  const path = paths[Math.floor(Math.random() * paths.length)];
+  const patterns = getPatternsForDepartment(key);
+  const pattern = patterns[Math.floor(Math.random() * patterns.length)];
   const scenario = normalize(scenarioContext) || "training-notice";
   const token = crypto.randomBytes(4).toString("hex");
+  const path = buildPath(pattern, scenario);
+  const query = buildQuery(pattern, token);
 
   return {
-    url: `https://${demoBaseDomain}/${path}/${scenario}?ref=awareness-${token}`,
+    url: `https://${demoBaseDomain}/${path}?${query}`,
     domain: demoBaseDomain,
     path,
+    patternId: pattern.id,
+    patternLabel: pattern.label,
     token,
     safeDemoOnly: true,
   };
 }
 
-module.exports = { generateTrainingLink };
+function getPatternsForDepartment(departmentKey) {
+  const matches = urlPatterns.filter((pattern) => pattern.departmentKey === departmentKey);
+  return matches.length ? matches : urlPatterns.filter((pattern) => pattern.departmentKey === "default");
+}
+
+function buildPath(pattern, scenario) {
+  return pattern.pathTemplate.replace("{scenario}", scenario);
+}
+
+function buildQuery(pattern, token) {
+  return pattern.queryTemplate.replace("{token}", token);
+}
+
+function buildSampleLinks(domain = demoBaseDomain, scenarioContext = "sample policy update") {
+  const scenario = normalize(scenarioContext) || "training-notice";
+  return urlPatterns.map((pattern, index) => {
+    const token = String(index + 1).padStart(4, "0");
+    const path = buildPath(pattern, scenario);
+    const query = buildQuery(pattern, token);
+    return {
+      id: pattern.id,
+      label: pattern.label,
+      departmentKey: pattern.departmentKey,
+      format: `https://${domain}/${pattern.pathTemplate}?${pattern.queryTemplate}`,
+      sampleUrl: `https://${domain}/${path}?${query}`,
+      safeDemoOnly: true,
+    };
+  });
+}
+
+module.exports = { buildSampleLinks, generateTrainingLink, urlPatterns };
