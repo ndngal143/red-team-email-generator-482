@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Authorized Email Exercise Generator</title>
+    <link rel="stylesheet" href="/static/styles.css">
+  </head>
+  <body>
+    <main class="shell">
+      <section class="panel">
+        <div class="heading">
+          <p class="eyebrow">Authorized internal testing</p>
+          <h1>Social Engineering Email Generator</h1>
+          <p class="subtle">Generate safe phishing-simulation drafts for security awareness exercises.</p>
+        </div>
+
+        <form action="/generate" method="post" class="form">
+          <label>
+            Target profile
+            <input name="target_profile" placeholder="finance employee" required>
+          </label>
+
+          <label>
+            Contextual detail
+            <textarea name="context" rows="4" placeholder="recent reimbursement policy change" required></textarea>
+          </label>
+
+          <label>
+            Tone
+            <select name="tone">
+              <option value="professional">Professional</option>
+              <option value="urgent">Urgent</option>
+              <option value="friendly">Friendly</option>
+            </select>
+          </label>
+
+          <label>
+            Deception intensity
+            <input name="intensity" type="range" min="1" max="5" value="3">
+          </label>
+
+          <label class="check">
+            <input name="authorization_attested" type="checkbox" value="yes" required>
+            I confirm this draft is for authorized internal testing only.
+          </label>
+
+          <button type="submit">Generate draft</button>
+        </form>
+      </section>
+    </main>
+  </body>
+</html>

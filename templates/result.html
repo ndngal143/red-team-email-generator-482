@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Generated Draft</title>
+    <link rel="stylesheet" href="/static/styles.css">
+  </head>
+  <body>
+    <main class="shell wide">
+      <section class="panel">
+        <div class="heading row">
+          <div>
+            <p class="eyebrow">Draft ready</p>
+            <h1>{{ draft.subject }}</h1>
+            <p class="subtle">{{ draft.preheader }}</p>
+          </div>
+          <a class="secondary" href="/">New draft</a>
+        </div>
+
+        <article class="email">
+          <pre>{{ draft.body }}</pre>
+          <p><strong>CTA:</strong> {{ draft.call_to_action }}</p>
+          <p><strong>Training link:</strong> {{ draft.training_link }}</p>
+        </article>
+
+        <section class="grid">
+          <div>
+            <h2>Anti-Spam Check</h2>
+            <ul>
+              {% for finding in draft.spam_findings %}
+              <li>{{ finding }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+          <div>
+            <h2>Safety Notes</h2>
+            <ul>
+              {% for note in draft.safety_notes %}
+              <li>{{ note }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+        </section>
+
+        <p class="subtle">Log ID: {{ draft.log_id }}</p>
+      </section>
+    </main>
+  </body>
+</html>
