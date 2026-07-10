@@ -1,7 +1,9 @@
-const { server } = require("../src/server");
-
 const testPort = 3099;
 const baseUrl = `http://localhost:${testPort}`;
+process.env.EMAILGEN_SKIP_DOTENV = "1";
+process.env.TRAINING_BASE_URL = baseUrl;
+
+const { server } = require("../src/server");
 
 async function main() {
   await new Promise((resolve) => server.listen(testPort, resolve));
@@ -14,6 +16,7 @@ async function main() {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       targetProfile: "Finance employee",
+      recipientEmail: "learner@example.com",
       department: "Finance",
       organization: "Example Corp",
       senderRole: "Finance Operations",
@@ -32,9 +35,25 @@ async function main() {
     throw new Error("Generate payload is missing expected fields");
   }
 
+  const clickResponse = await fetch(payload.link.url, { redirect: "manual" });
+  if (clickResponse.status !== 302) {
+    throw new Error(`Tracking link did not redirect: ${clickResponse.status}`);
+  }
+
+  const logs = await fetch(`${baseUrl}/api/logs`).then((res) => res.json());
+  const generatedLog = logs.logs.find((entry) => entry.id === payload.id);
+  if (!generatedLog?.clickMetrics?.count) {
+    throw new Error("Tracking click was not recorded in the logs");
+  }
+  if (!generatedLog.feedbackNotification) {
+    throw new Error("Feedback notification was not recorded");
+  }
+
   console.log("Smoke test passed");
   console.log(`Subject: ${payload.email.subject}`);
   console.log(`Training URL: ${payload.link.url}`);
+  console.log(`Click count: ${generatedLog.clickMetrics.count}`);
+  console.log(`Feedback status: ${generatedLog.feedbackNotification.status}`);
   console.log(`Spam score: ${payload.spam.score}`);
 }
 
