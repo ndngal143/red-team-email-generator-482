@@ -84,7 +84,7 @@ function logsAsCsv() {
     const clickCount = clicks.filter((click) => click.generatedEmailId === entry.id).length;
     const notification = notifications.find((item) => item.generatedEmailId === entry.id);
     return [
-      entry.timestamp,
+      formatTimestamp(entry.timestamp),
       entry.input.recipientEmail,
       entry.input.targetProfile,
       entry.input.department,
@@ -101,6 +101,18 @@ function logsAsCsv() {
   });
 
   return [headers, ...rows].map((row) => row.map(csvEscape).join(",")).join("\n");
+}
+
+function formatTimestamp(timestamp) {
+  return new Date(timestamp).toLocaleString("sv-SE", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  });
 }
 
 function csvEscape(value) {
