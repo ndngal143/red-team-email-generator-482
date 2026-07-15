@@ -32,8 +32,30 @@ async function main() {
     throw new Error("Generate payload is missing expected fields");
   }
 
+  const revisionResponse = await fetch(`${baseUrl}/api/revise`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      originalId: payload.id,
+      revisionRequest: "Make the draft shorter and friendlier while keeping the same training link.",
+      input: payload.input,
+      email: payload.email,
+      trainingLink: payload.link,
+    }),
+  });
+
+  if (!revisionResponse.ok) {
+    throw new Error(`Revision endpoint failed: ${revisionResponse.status}`);
+  }
+
+  const revisionPayload = await revisionResponse.json();
+  if (!revisionPayload.email?.subject || !revisionPayload.revisionOf || typeof revisionPayload.spam?.score !== "number") {
+    throw new Error("Revision payload is missing expected fields");
+  }
+
   console.log("Smoke test passed");
   console.log(`Subject: ${payload.email.subject}`);
+  console.log(`Revised Subject: ${revisionPayload.email.subject}`);
   console.log(`Training URL: ${payload.link.url}`);
   console.log(`Spam score: ${payload.spam.score}`);
 }

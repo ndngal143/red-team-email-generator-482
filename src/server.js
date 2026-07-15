@@ -2,8 +2,8 @@ const http = require("node:http");
 const fs = require("node:fs");
 const path = require("node:path");
 const crypto = require("node:crypto");
-const { port } = require("./config");
-const { generateEmail } = require("./generator");
+const { demoBaseDomain, port } = require("./config");
+const { generateEmail, reviseEmail } = require("./generator");
 const { generateTrainingLink } = require("./linkGenerator");
 const { checkSpamIndicators } = require("./spamChecker");
 const { appendLog, readLogs, logsAsCsv } = require("./logStore");
@@ -46,6 +46,33 @@ const server = http.createServer(async (req, res) => {
       return sendJson(res, 200, entry);
     }
 
+    if (req.method === "POST" && req.url === "/api/revise") {
+      const payload = await readJson(req);
+      const validationError = validateRevisionInput(payload);
+      if (validationError) return sendJson(res, 400, { error: validationError });
+
+      const safetyError = validateSafety({
+        ...payload.input,
+        scenarioContext: `${payload.input.scenarioContext || ""} ${payload.revisionRequest || ""}`,
+      });
+      if (safetyError) return sendJson(res, 400, { error: safetyError });
+
+      const email = await reviseEmail(payload);
+      const spam = checkSpamIndicators({ subject: email.subject, body: email.body });
+      const entry = {
+        id: crypto.randomUUID(),
+        timestamp: new Date().toISOString(),
+        revisionOf: payload.originalId || "",
+        revisionRequest: payload.revisionRequest,
+        input: payload.input,
+        email,
+        link: payload.trainingLink,
+        spam,
+      };
+      appendLog(entry);
+      return sendJson(res, 200, entry);
+    }
+
     if (req.method === "GET" && req.url === "/api/logs") {
       return sendJson(res, 200, { logs: readLogs() });
     }
@@ -74,6 +101,28 @@ function validateInput(input) {
   if (!["urgent", "professional", "friendly"].includes(input.tone)) return "Invalid tone";
   if (!["low", "medium", "high"].includes(input.intensity)) return "Invalid intensity";
   return "";
+}
+
+function validateRevisionInput(payload) {
+  if (!payload || typeof payload !== "object") return "Missing revision payload";
+  if (!payload.input || typeof payload.input !== "object") return "Missing original input";
+  if (!payload.email || typeof payload.email !== "object") return "Missing generated email";
+  if (!payload.trainingLink || typeof payload.trainingLink !== "object") return "Missing training link";
+  if (!isSafeTrainingUrl(payload.trainingLink.url)) return "Invalid training link";
+  if (!String(payload.email.subject || "").trim()) return "Missing email subject";
+  if (!String(payload.email.body || "").trim()) return "Missing email body";
+  if (!String(payload.revisionRequest || "").trim()) return "Missing revision request";
+  if (String(payload.revisionRequest).length > 1000) return "Revision request is too long";
+  return validateInput(payload.input);
+}
+
+function isSafeTrainingUrl(value) {
+  try {
+    const url = new URL(String(value || ""));
+    return url.protocol === "https:" && url.hostname === demoBaseDomain;
+  } catch (error) {
+    return false;
+  }
 }
 
 function readJson(req) {

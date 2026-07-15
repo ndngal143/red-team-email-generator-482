@@ -108,6 +108,49 @@ function buildPrompt(input, trainingLink) {
   ];
 }
 
+function buildRevisionPrompt({ input, trainingLink, email, revisionRequest }) {
+  return [
+    {
+      role: "system",
+      content:
+        "You revise email drafts only for authorized internal security awareness exercises. " +
+        "Preserve the supplied safe training link. Do not add credential collection instructions, malware instructions, evasion steps, or real-world abuse guidance. " +
+        "Return JSON with subject, senderName, body, and callToAction.",
+    },
+    {
+      role: "user",
+      content: JSON.stringify({
+        task: "Revise this authorized security awareness training email draft according to the requested changes.",
+        originalContext: {
+          targetProfile: input.targetProfile,
+          department: input.department,
+          scenarioContext: input.scenarioContext,
+          organization: input.organization,
+          senderRole: input.senderRole,
+          tone: input.tone,
+          deceptionIntensity: input.intensity,
+        },
+        currentEmail: {
+          subject: email.subject,
+          senderName: email.senderName,
+          body: email.body,
+          callToAction: email.callToAction,
+        },
+        revisionRequest,
+        safeTrainingLink: trainingLink.url,
+        constraints: [
+          "Training/demo use only",
+          "No credential harvesting wording",
+          "No attachment payloads",
+          "No instructions to bypass security tools",
+          "Keep the revision aligned with the original department and scenario context",
+          "Use only the supplied safe training link",
+        ],
+      }),
+    },
+  ];
+}
+
 async function generateEmail(input, trainingLink) {
   // TODO Milestone 3 / Sebastian: Add request validation and timeout handling.
   if (!openaiApiKey) {
@@ -141,6 +184,59 @@ async function generateEmail(input, trainingLink) {
     return normalizeEmail(parsed, input, trainingLink, `Generated with OpenAI model: ${selectedModel}`);
   } catch (error) {
     return fallbackEmail(input, trainingLink, `OpenAI generation error: ${error.message}`);
+  }
+}
+
+async function reviseEmail({ input, trainingLink, email, revisionRequest }) {
+  if (!openaiApiKey) {
+    return fallbackRevisionEmail({
+      input,
+      trainingLink,
+      email,
+      revisionRequest,
+      note: "No OPENAI_API_KEY found; used local demo revision template.",
+    });
+  }
+
+  try {
+    const selectedModel = await resolveOpenAIModel();
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${openaiApiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: selectedModel,
+        messages: buildRevisionPrompt({ input, trainingLink, email, revisionRequest }),
+        temperature: 0.55,
+        response_format: { type: "json_object" },
+      }),
+    });
+
+    if (!response.ok) {
+      const detail = await response.text();
+      return fallbackRevisionEmail({
+        input,
+        trainingLink,
+        email,
+        revisionRequest,
+        note: `OpenAI revision failed: ${response.status} ${detail.slice(0, 160)}`,
+      });
+    }
+
+    const payload = await response.json();
+    const content = payload.choices?.[0]?.message?.content || "{}";
+    const parsed = JSON.parse(content);
+    return normalizeEmail(parsed, input, trainingLink, `Revised with OpenAI model: ${selectedModel}`);
+  } catch (error) {
+    return fallbackRevisionEmail({
+      input,
+      trainingLink,
+      email,
+      revisionRequest,
+      note: `OpenAI revision error: ${error.message}`,
+    });
   }
 }
 
@@ -230,6 +326,26 @@ function fallbackEmail(input, trainingLink, note) {
   };
 }
 
+function fallbackRevisionEmail({ input, trainingLink, email, revisionRequest, note }) {
+  const requestedChange = String(revisionRequest || "").trim();
+  const changeSummary = requestedChange || "General wording polish requested";
+  const subject = reviseFallbackSubject(email.subject, changeSummary);
+  const senderName = email.senderName || input.senderRole || "Internal Communications";
+  const body =
+    `${email.body || ""}`.trim() +
+    `\n\nRevision note for demo review: ${changeSummary}. ` +
+    `The revised draft keeps the authorized training context and safe link unchanged.\n\n` +
+    `Training link: ${trainingLink.url}`;
+
+  return {
+    subject,
+    senderName,
+    body,
+    callToAction: email.callToAction || `Review the training notice: ${trainingLink.url}`,
+    generationNote: note,
+  };
+}
+
 function getToneTemplate(tone) {
   return toneTemplates[tone] || toneTemplates.professional;
 }
@@ -294,11 +410,28 @@ function trimToLength(value, maxLength) {
   return `${trimmed.replace(/[\s,;:.-]+[^\s,;:.-]*$/, "")}...`;
 }
 
+function reviseFallbackSubject(subject, revisionRequest) {
+  const cleanSubject = String(subject || "Internal training notice").replace(/\s+/g, " ").trim();
+  const lowerRequest = String(revisionRequest || "").toLowerCase();
+  if (lowerRequest.includes("short") || lowerRequest.includes("concise")) {
+    return trimToLength(cleanSubject, 64);
+  }
+  if (lowerRequest.includes("urgent") || lowerRequest.includes("time")) {
+    return trimToLength(`Time-sensitive: ${cleanSubject}`, 78);
+  }
+  if (lowerRequest.includes("friendly") || lowerRequest.includes("warmer")) {
+    return trimToLength(`Quick heads up: ${cleanSubject}`, 78);
+  }
+  return trimToLength(`Revised: ${cleanSubject}`, 78);
+}
+
 module.exports = {
+  buildRevisionPrompt,
   buildPrompt,
   generateEmail,
   getIntensityTemplate,
   getToneTemplate,
+  reviseEmail,
   resolveOpenAIModel,
   selectModel,
 };

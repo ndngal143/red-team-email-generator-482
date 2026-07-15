@@ -167,6 +167,20 @@ form button {
   white-space: pre-wrap;
 }
 
+.revision-form {
+  border-top: 1px solid var(--line);
+  margin-top: 18px;
+  padding-top: 16px;
+}
+
+.revision-form textarea {
+  min-height: 88px;
+}
+
+.revision-form button {
+  width: 100%;
+}
+
 .meta-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
