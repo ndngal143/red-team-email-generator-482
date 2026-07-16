@@ -167,6 +167,12 @@ form button {
   white-space: pre-wrap;
 }
 
+.email-cta {
+  border-top: 1px solid var(--line);
+  margin: 14px 0 0;
+  padding-top: 12px;
+}
+
 .meta-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

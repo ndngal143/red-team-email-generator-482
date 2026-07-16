@@ -40,6 +40,7 @@ function renderResult(entry) {
       <h3>${escapeHtml(entry.email.subject)}</h3>
       <p><strong>From:</strong> ${escapeHtml(entry.email.senderName)}</p>
       <div class="email-body">${escapeHtml(entry.email.body)}</div>
+      <p class="email-cta"><strong>Call to action:</strong> ${escapeHtml(entry.email.callToAction)}</p>
     </div>
 
     <div class="meta-grid">
