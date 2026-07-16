@@ -83,8 +83,8 @@ function renderResult(entry) {
     <div class="email-card">
       <h3>${escapeHtml(entry.email.subject)}</h3>
       <p><strong>From:</strong> ${escapeHtml(entry.email.senderName)}</p>
-      <div class="email-body">${escapeHtml(entry.email.body)}</div>
-      <p class="email-cta"><strong>Call to action:</strong> ${escapeHtml(entry.email.callToAction)}</p>
+      <div class="email-body">${renderLinkedText(entry.email.body, entry)}</div>
+      <p class="email-cta"><strong>Call to action:</strong> ${renderLinkedText(entry.email.callToAction, entry)}</p>
     </div>
 
     <div class="meta-grid">
@@ -156,6 +156,25 @@ function escapeHtml(value) {
 
 function escapeAttr(value) {
   return escapeHtml(value).replace(/`/g, "&#096;");
+}
+
+function renderLinkedText(value, entry) {
+  const text = String(value ?? "");
+  const url = String(entry.link?.url || "");
+  const linkText = String(entry.email?.linkText || "safe training page");
+  const linkedHtml = `<a href="${escapeAttr(url)}" target="_blank" rel="noreferrer">${escapeHtml(linkText)}</a>`;
+
+  if (!url) return escapeHtml(text);
+
+  if (text.includes(url)) {
+    return escapeHtml(text).replaceAll(escapeHtml(url), linkedHtml);
+  }
+
+  if (linkText && text.includes(linkText)) {
+    return escapeHtml(text).replace(escapeHtml(linkText), linkedHtml);
+  }
+
+  return `${escapeHtml(text)} <span class="embedded-link">(${linkedHtml})</span>`;
 }
 
 loadLogs();

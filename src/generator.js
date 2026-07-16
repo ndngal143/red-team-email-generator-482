@@ -74,7 +74,7 @@ function buildPrompt(input, trainingLink) {
         "You generate email drafts only for authorized internal security awareness exercises. " +
         "Do not provide credential collection instructions, malware instructions, evasion steps, or real-world abuse guidance. " +
         "If the user asks for credential collection, malware delivery, evasion, or real abuse, refuse by returning a safe training-focused alternative." +
-        "Use the supplied safe training link only. Return JSON with subject, senderName, body, and callToAction.",
+        "Use the supplied safe training link only. Return JSON with subject, senderName, body, callToAction, and linkText.",
     },
     {
       role: "user",
@@ -89,11 +89,15 @@ function buildPrompt(input, trainingLink) {
         deceptionIntensity: input.intensity,
         promptTemplate: template,
         safeTrainingLink: trainingLink.url,
+        linkTextGuidance:
+          "Choose a short, descriptive noun phrase for linkText such as \"safe training page\". Do not disguise the destination as a login portal, document download, invoice, or credential form.",
         constraints: [
           "Training/demo use only",
           "No credential harvesting wording",
           "No attachment payloads",
           "No instructions to bypass security tools",
+          "Use linkText as the visible embedded link phrase instead of pasting the raw URL inside the email body.",
+          "Keep the linkText honest and training-focused.",
           "Tone must be clearly recognizable from the wording.",
           "Deception intensity must visibly change the subject line, urgency, and call-to-action strength.",
           `Follow this subject pattern: ${template.subjectPattern}`,
@@ -115,7 +119,7 @@ function buildRevisionPrompt(input, currentEmail, trainingLink, changeRequest) {
         "You revise email drafts only for authorized internal security awareness exercises. " +
         "Keep the message safe, training-focused, and non-credential-harvesting. " +
         "Do not add malware, attachment payloads, evasion steps, credential collection, threats, or real-world abuse guidance. " +
-        "Use the supplied safe training link only. Return JSON with subject, senderName, body, and callToAction.",
+        "Use the supplied safe training link only. Return JSON with subject, senderName, body, callToAction, and linkText.",
     },
     {
       role: "user",
@@ -132,8 +136,12 @@ function buildRevisionPrompt(input, currentEmail, trainingLink, changeRequest) {
         promptTemplate: template,
         currentEmail,
         safeTrainingLink: trainingLink.url,
+        linkTextGuidance:
+          "Use a short, descriptive noun phrase for the embedded link. Do not disguise the destination as a credential portal, file download, invoice, or login page.",
         constraints: [
           "Keep the same safe training link.",
+          "Use linkText as the visible embedded link phrase instead of pasting the raw URL inside the email body.",
+          "Keep the linkText honest and training-focused.",
           "Do not request passwords, credentials, MFA codes, sensitive information, or file downloads.",
           "Do not include attachment payloads or security bypass instructions.",
           "Respect the requested change while preserving the selected tone and deception intensity.",
@@ -277,11 +285,13 @@ function selectModel(modelIds) {
 }
 
 function normalizeEmail(email, input, trainingLink, note) {
+  const linkText = sanitizeLinkText(email.linkText) || safeLinkText(input);
   return {
     subject: email.subject || `${input.organization || "Internal"} policy update`,
     senderName: email.senderName || input.senderRole || "Internal Communications",
     body: email.body || "",
     callToAction: email.callToAction || `Review the training notice: ${trainingLink.url}`,
+    linkText,
     generationNote: note,
   };
 }
@@ -292,6 +302,7 @@ function fallbackEmail(input, trainingLink, note) {
   const scenario = input.scenarioContext || "an internal policy update";
   const sender = input.senderRole || "Internal Communications";
   const template = getPromptTemplate(input.tone, input.intensity);
+  const linkText = safeLinkText(input);
   const subject = `${organization}: ${template.subjectPattern.replace("{scenario}", scenario)}`;
   const toneLead = {
     urgent: {
@@ -311,10 +322,10 @@ function fallbackEmail(input, trainingLink, note) {
     },
   }[input.tone]?.[input.intensity] || "Please review the following internal training notice.";
   const callToAction = {
-    low: `Review the safe training page when convenient: ${trainingLink.url}`,
-    medium: `Open the safe training page and complete today's review: ${trainingLink.url}`,
-    high: `Open the safe training page now and finish the short review: ${trainingLink.url}`,
-  }[input.intensity] || `Review the safe training page: ${trainingLink.url}`;
+    low: `Review the ${linkText} when convenient.`,
+    medium: `Open the ${linkText} and complete today's review.`,
+    high: `Open the ${linkText} now and finish the short review.`,
+  }[input.intensity] || `Review the ${linkText}.`;
 
   return {
     subject,
@@ -322,10 +333,10 @@ function fallbackEmail(input, trainingLink, note) {
     body:
       `${toneLead}\n\n` +
       `This authorized awareness exercise is tailored for ${input.targetProfile || "employees"} in ${department}. ` +
-      `The scenario is based on ${scenario}. Review the safe training page below and note any indicators that helped you evaluate the message.\n\n` +
-      `Training link: ${trainingLink.url}\n\n` +
+      `The scenario is based on ${scenario}. Please review the ${linkText} and note any indicators that helped you evaluate the message.\n\n` +
       `Thank you,\n${sender}`,
     callToAction,
+    linkText,
     generationNote: note,
   };
 }
@@ -338,6 +349,7 @@ function fallbackRevision(input, currentEmail, trainingLink, changeRequest, note
   const wantsUrgent = request.includes("urgent") || request.includes("stronger") || request.includes("direct");
   const wantsShorter = request.includes("short") || request.includes("concise") || request.includes("brief");
   const scenario = input.scenarioContext || "an internal policy update";
+  const linkText = sanitizeLinkText(currentEmail.linkText) || safeLinkText(input);
   const lead = wantsFriendly
     ? "Quick update: we softened the wording while keeping this as a safe awareness exercise."
     : wantsUrgent
@@ -349,25 +361,46 @@ function fallbackRevision(input, currentEmail, trainingLink, changeRequest, note
       ? `${organization}: Updated action requested for ${scenario}`
       : `Updated: ${currentEmail.subject || `${organization}: ${scenario}`}`;
   const body = wantsShorter
-    ? `${lead}\n\nThis revised draft is for ${input.targetProfile || "employees"} in ${input.department || "your department"} and keeps the training link safe.\n\nTraining link: ${trainingLink.url}\n\nThank you,\n${sender}`
-    : `${lead}\n\nRequested change: ${changeRequest}\n\nThis authorized awareness exercise remains tailored for ${input.targetProfile || "employees"} in ${input.department || "your department"}. The scenario is based on ${scenario}. Use the safe training page below to review the indicators in the message.\n\nTraining link: ${trainingLink.url}\n\nThank you,\n${sender}`;
+    ? `${lead}\n\nThis revised draft is for ${input.targetProfile || "employees"} in ${input.department || "your department"}. Please review the ${linkText} when you can.\n\nThank you,\n${sender}`
+    : `${lead}\n\nRequested change: ${changeRequest}\n\nThis authorized awareness exercise remains tailored for ${input.targetProfile || "employees"} in ${input.department || "your department"}. The scenario is based on ${scenario}. Please review the ${linkText} to review the indicators in the message.\n\nThank you,\n${sender}`;
   const callToAction = wantsFriendly
-    ? `Take a quick look at the safe training page when you can: ${trainingLink.url}`
+    ? `Take a quick look at the ${linkText} when you can.`
     : wantsUrgent
-      ? `Open the safe training page now and complete the updated review: ${trainingLink.url}`
-      : `Review the updated safe training page: ${trainingLink.url}`;
+      ? `Open the ${linkText} now and complete the updated review.`
+      : `Review the updated ${linkText}.`;
 
   return {
     subject,
     senderName: sender,
     body,
     callToAction,
+    linkText,
     generationNote: note,
   };
 }
 
 function getPromptTemplate(tone, intensity) {
   return promptTemplates[tone]?.[intensity] || promptTemplates.professional.medium;
+}
+
+function safeLinkText(input) {
+  const scenario = String(input.scenarioContext || "training notice")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase();
+  if (scenario.includes("reimbursement")) return "reimbursement training page";
+  if (scenario.includes("benefit")) return "benefits training page";
+  if (scenario.includes("policy")) return "policy training page";
+  return "safe training page";
+}
+
+function sanitizeLinkText(value) {
+  const text = String(value || "")
+    .replace(/\s+/g, " ")
+    .trim();
+  const blockedTerms = /\b(login|password|credential|mfa|2fa|otp|invoice|payment|wire|download|attachment|document)\b/i;
+  if (!text || text.length > 80 || blockedTerms.test(text)) return "";
+  return text;
 }
 
 module.exports = { generateEmail, reviseEmail, resolveOpenAIModel, selectModel, getPromptTemplate };

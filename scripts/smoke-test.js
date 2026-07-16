@@ -52,6 +52,10 @@ async function main() {
     throw new Error("Deception intensity did not change call-to-action strength");
   }
 
+  if (!payload.email.linkText || !payload.email.body.includes(payload.email.linkText)) {
+    throw new Error("Generated draft did not include embedded safe link text");
+  }
+
   if (!urgentHigh.email.body.includes("now") || !friendlyLow.email.body.includes("Quick heads up")) {
     throw new Error("Tone/intensity templates did not change body urgency");
   }
@@ -68,6 +72,9 @@ async function main() {
   }
   if (!revision.email.callToAction.includes("when you can")) {
     throw new Error("Revision did not apply the requested softer call to action");
+  }
+  if (!revision.email.linkText || !revision.email.body.includes(revision.email.linkText)) {
+    throw new Error("Revision did not preserve embedded safe link text");
   }
 
   const clickResponse = await fetch(payload.link.url, { redirect: "manual" });
@@ -107,7 +114,7 @@ async function generateCase(input) {
   }
 
   const payload = await response.json();
-  if (!payload.email?.subject || !payload.link?.url || typeof payload.spam?.score !== "number") {
+  if (!payload.email?.subject || !payload.email?.linkText || !payload.link?.url || typeof payload.spam?.score !== "number") {
     throw new Error("Generate payload is missing expected fields");
   }
   return payload;
@@ -131,7 +138,7 @@ async function reviseCase(entry, changeRequest) {
   }
 
   const payload = await response.json();
-  if (!payload.email?.subject || !payload.link?.url || typeof payload.spam?.score !== "number") {
+  if (!payload.email?.subject || !payload.email?.linkText || !payload.link?.url || typeof payload.spam?.score !== "number") {
     throw new Error("Revision payload is missing expected fields");
   }
   return payload;

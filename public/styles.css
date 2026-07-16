@@ -178,6 +178,10 @@ form button {
   padding-top: 12px;
 }
 
+.embedded-link {
+  color: var(--muted);
+}
+
 .revision-form {
   border-top: 1px solid var(--line);
   margin-top: 18px;
