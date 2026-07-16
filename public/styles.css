@@ -81,6 +81,11 @@ button:hover,
   background: var(--accent-dark);
 }
 
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
 .notice {
   border: 1px solid #f0d28a;
   background: var(--warning-bg);
@@ -171,6 +176,20 @@ form button {
   border-top: 1px solid var(--line);
   margin: 14px 0 0;
   padding-top: 12px;
+}
+
+.revision-form {
+  border-top: 1px solid var(--line);
+  margin-top: 18px;
+  padding-top: 16px;
+}
+
+.revision-form textarea {
+  min-height: 84px;
+}
+
+.revision-form button {
+  margin-top: 0;
 }
 
 .meta-grid {

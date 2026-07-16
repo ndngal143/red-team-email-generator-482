@@ -56,13 +56,27 @@ async function main() {
     throw new Error("Tone/intensity templates did not change body urgency");
   }
 
+  const revision = await reviseCase(payload, "Make it shorter and more friendly with a softer call to action.");
+  if (revision.revisionOf !== payload.id) {
+    throw new Error("Revision response did not reference the original generated email");
+  }
+  if (revision.link.url !== payload.link.url) {
+    throw new Error("Revision did not keep the same safe training link");
+  }
+  if (revision.email.subject === payload.email.subject || revision.email.body === payload.email.body) {
+    throw new Error("Revision did not change the generated wording");
+  }
+  if (!revision.email.callToAction.includes("when you can")) {
+    throw new Error("Revision did not apply the requested softer call to action");
+  }
+
   const clickResponse = await fetch(payload.link.url, { redirect: "manual" });
   if (clickResponse.status !== 302) {
     throw new Error(`Tracking link did not redirect: ${clickResponse.status}`);
   }
 
   const logs = await fetch(`${baseUrl}/api/logs`).then((res) => res.json());
-  const generatedLog = logs.logs.find((entry) => entry.id === payload.id);
+  const generatedLog = logs.logs.find((entry) => entry.link?.token === payload.link.token && entry.clickMetrics?.count);
   if (!generatedLog?.clickMetrics?.count) {
     throw new Error("Tracking click was not recorded in the logs");
   }
@@ -74,6 +88,7 @@ async function main() {
   console.log(`Subject: ${payload.email.subject}`);
   console.log(`Urgent/high subject: ${urgentHigh.email.subject}`);
   console.log(`Friendly/low subject: ${friendlyLow.email.subject}`);
+  console.log(`Revision subject: ${revision.email.subject}`);
   console.log(`Training URL: ${payload.link.url}`);
   console.log(`Click count: ${generatedLog.clickMetrics.count}`);
   console.log(`Feedback status: ${generatedLog.feedbackNotification.status}`);
@@ -94,6 +109,30 @@ async function generateCase(input) {
   const payload = await response.json();
   if (!payload.email?.subject || !payload.link?.url || typeof payload.spam?.score !== "number") {
     throw new Error("Generate payload is missing expected fields");
+  }
+  return payload;
+}
+
+async function reviseCase(entry, changeRequest) {
+  const response = await fetch(`${baseUrl}/api/revise`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      originalId: entry.id,
+      input: entry.input,
+      email: entry.email,
+      link: entry.link,
+      changeRequest,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Revise endpoint failed: ${response.status}`);
+  }
+
+  const payload = await response.json();
+  if (!payload.email?.subject || !payload.link?.url || typeof payload.spam?.score !== "number") {
+    throw new Error("Revision payload is missing expected fields");
   }
   return payload;
 }

@@ -3,7 +3,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const crypto = require("node:crypto");
 const { host, port } = require("./config");
-const { generateEmail } = require("./generator");
+const { generateEmail, reviseEmail } = require("./generator");
 const { generateTrainingLink } = require("./linkGenerator");
 const { checkSpamIndicators } = require("./spamChecker");
 const { sendFeedbackEmail } = require("./feedbackMailer");
@@ -59,6 +59,30 @@ const server = http.createServer(async (req, res) => {
       return sendJson(res, 200, entry);
     }
 
+    if (req.method === "POST" && requestUrl.pathname === "/api/revise") {
+      const input = await readJson(req);
+      const validationError = validateRevisionInput(input);
+      if (validationError) return sendJson(res, 400, { error: validationError });
+
+      const safetyError = validateSafety({ ...input.input, changeRequest: input.changeRequest });
+      if (safetyError) return sendJson(res, 400, { error: safetyError });
+
+      const email = await reviseEmail(input.input, input.email, input.link, input.changeRequest);
+      const spam = checkSpamIndicators({ subject: email.subject, body: email.body });
+      const entry = {
+        id: crypto.randomUUID(),
+        revisionOf: input.originalId || "",
+        timestamp: new Date().toISOString(),
+        input: input.input,
+        changeRequest: input.changeRequest,
+        email,
+        link: input.link,
+        spam,
+      };
+      appendLog(entry);
+      return sendJson(res, 200, entry);
+    }
+
     if (req.method === "GET" && requestUrl.pathname === "/api/logs") {
       return sendJson(res, 200, { logs: enrichLogs(readLogs()) });
     }
@@ -106,6 +130,26 @@ function validateInput(input) {
   if (input.recipientEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.recipientEmail)) {
     return "Invalid recipient email";
   }
+  return "";
+}
+
+function validateRevisionInput(input) {
+  if (!input || typeof input !== "object") return "Missing revision request";
+  if (!input.input || typeof input.input !== "object") return "Missing original generation input";
+  if (!input.email || typeof input.email !== "object") return "Missing generated email";
+  if (!input.link || typeof input.link !== "object" || !String(input.link.url || "").trim()) {
+    return "Missing safe training link";
+  }
+  if (!String(input.changeRequest || "").trim()) return "Missing requested change";
+
+  const baseValidationError = validateInput(input.input);
+  if (baseValidationError) return baseValidationError;
+
+  const requiredEmailFields = ["subject", "senderName", "body", "callToAction"];
+  for (const key of requiredEmailFields) {
+    if (!String(input.email[key] || "").trim()) return `Missing generated email field: ${key}`;
+  }
+
   return "";
 }
 
@@ -273,6 +317,7 @@ function validateSafety(input) {
     input.organization,
     input.senderRole,
     input.scenarioContext,
+    input.changeRequest,
   ]
     .join(" ")
     .toLowerCase()

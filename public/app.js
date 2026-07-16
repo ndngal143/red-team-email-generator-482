@@ -3,10 +3,12 @@ const statusBox = document.querySelector("#status");
 const result = document.querySelector("#result");
 const logs = document.querySelector("#logs");
 const refreshLogs = document.querySelector("#refreshLogs");
+let currentEntry = null;
 
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
   const input = Object.fromEntries(new FormData(form).entries());
+  currentEntry = null;
   statusBox.textContent = "Generating draft...";
   result.className = "result empty";
   result.innerHTML = "<p>Working...</p>";
@@ -32,7 +34,49 @@ form.addEventListener("submit", async (event) => {
 
 refreshLogs.addEventListener("click", loadLogs);
 
+result.addEventListener("submit", async (event) => {
+  if (!event.target.matches("#revisionForm")) return;
+  event.preventDefault();
+  if (!currentEntry) return;
+
+  const changeRequest = String(new FormData(event.target).get("changeRequest") || "").trim();
+  if (!changeRequest) {
+    statusBox.textContent = "Describe the change you want before requesting a revision.";
+    return;
+  }
+
+  const button = event.target.querySelector("button");
+  button.disabled = true;
+  statusBox.textContent = "Revising draft...";
+
+  try {
+    const response = await fetch("/api/revise", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        originalId: currentEntry.id,
+        input: currentEntry.input,
+        email: currentEntry.email,
+        link: currentEntry.link,
+        changeRequest,
+      }),
+    });
+
+    const payload = await response.json();
+    if (!response.ok) throw new Error(payload.error || "Revision failed");
+
+    renderResult(payload, changeRequest);
+    await loadLogs();
+    statusBox.textContent = payload.email.generationNote;
+  } catch (error) {
+    statusBox.textContent = error.message;
+  } finally {
+    button.disabled = false;
+  }
+});
+
 function renderResult(entry) {
+  currentEntry = entry;
   const spamLevel = entry.spam.level.toLowerCase();
   result.className = "result";
   result.innerHTML = `
@@ -62,6 +106,14 @@ function renderResult(entry) {
     <ul>
       ${entry.spam.indicators.length ? entry.spam.indicators.map((item) => `<li>${escapeHtml(item)}</li>`).join("") : "<li>No major indicators detected.</li>"}
     </ul>
+
+    <form id="revisionForm" class="revision-form">
+      <label>
+        Ask AI for changes
+        <textarea name="changeRequest" required placeholder="Example: Make it shorter and more friendly, but keep the same training link.">${escapeHtml(entry.changeRequest || "")}</textarea>
+      </label>
+      <button type="submit">Revise Draft</button>
+    </form>
   `;
 }
 
@@ -76,7 +128,7 @@ async function loadLogs() {
   logs.innerHTML = payload.logs.map((entry) => `
     <div class="log-row">
       <strong>${escapeHtml(entry.email.subject)}</strong>
-      <small>${escapeHtml(formatTimestamp(entry.timestamp))} | ${escapeHtml(entry.input.department)} | ${escapeHtml(entry.input.tone)} | score ${entry.spam.score} | clicks ${entry.clickMetrics?.count || 0}${entry.clickMetrics?.lastClickedAt ? ` | last click ${escapeHtml(formatTimestamp(entry.clickMetrics.lastClickedAt))}` : ""}</small>
+      <small>${escapeHtml(formatTimestamp(entry.timestamp))} | ${escapeHtml(entry.revisionOf ? "revision" : "original")} | ${escapeHtml(entry.input.department)} | ${escapeHtml(entry.input.tone)} | score ${entry.spam.score} | clicks ${entry.clickMetrics?.count || 0}${entry.clickMetrics?.lastClickedAt ? ` | last click ${escapeHtml(formatTimestamp(entry.clickMetrics.lastClickedAt))}` : ""}</small>
     </div>
   `).join("");
 }

@@ -106,6 +106,44 @@ function buildPrompt(input, trainingLink) {
   ];
 }
 
+function buildRevisionPrompt(input, currentEmail, trainingLink, changeRequest) {
+  const template = getPromptTemplate(input.tone, input.intensity);
+  return [
+    {
+      role: "system",
+      content:
+        "You revise email drafts only for authorized internal security awareness exercises. " +
+        "Keep the message safe, training-focused, and non-credential-harvesting. " +
+        "Do not add malware, attachment payloads, evasion steps, credential collection, threats, or real-world abuse guidance. " +
+        "Use the supplied safe training link only. Return JSON with subject, senderName, body, and callToAction.",
+    },
+    {
+      role: "user",
+      content: JSON.stringify({
+        task: "Revise this existing authorized security awareness training email draft.",
+        requestedChange: changeRequest,
+        targetProfile: input.targetProfile,
+        department: input.department,
+        scenarioContext: input.scenarioContext,
+        organization: input.organization,
+        senderRole: input.senderRole,
+        tone: input.tone,
+        deceptionIntensity: input.intensity,
+        promptTemplate: template,
+        currentEmail,
+        safeTrainingLink: trainingLink.url,
+        constraints: [
+          "Keep the same safe training link.",
+          "Do not request passwords, credentials, MFA codes, sensitive information, or file downloads.",
+          "Do not include attachment payloads or security bypass instructions.",
+          "Respect the requested change while preserving the selected tone and deception intensity.",
+          "Make the wording visibly different from the previous draft.",
+        ],
+      }),
+    },
+  ];
+}
+
 async function generateEmail(input, trainingLink) {
   // TODO Milestone 3 / Joyce: Improve prompt templates for each tone and intensity.
   // TODO Milestone 3 / Sebastian: Add request validation and timeout handling.
@@ -140,6 +178,53 @@ async function generateEmail(input, trainingLink) {
     return normalizeEmail(parsed, input, trainingLink, `Generated with OpenAI model: ${selectedModel}`);
   } catch (error) {
     return fallbackEmail(input, trainingLink, `OpenAI generation error: ${error.message}`);
+  }
+}
+
+async function reviseEmail(input, currentEmail, trainingLink, changeRequest) {
+  if (!openaiApiKey) {
+    return fallbackRevision(
+      input,
+      currentEmail,
+      trainingLink,
+      changeRequest,
+      "No OPENAI_API_KEY found; used local demo revision."
+    );
+  }
+
+  try {
+    const selectedModel = await resolveOpenAIModel();
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${openaiApiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: selectedModel,
+        messages: buildRevisionPrompt(input, currentEmail, trainingLink, changeRequest),
+        temperature: 0.65,
+        response_format: { type: "json_object" },
+      }),
+    });
+
+    if (!response.ok) {
+      const detail = await response.text();
+      return fallbackRevision(
+        input,
+        currentEmail,
+        trainingLink,
+        changeRequest,
+        `OpenAI revision failed: ${response.status} ${detail.slice(0, 160)}`
+      );
+    }
+
+    const payload = await response.json();
+    const content = payload.choices?.[0]?.message?.content || "{}";
+    const parsed = JSON.parse(content);
+    return normalizeEmail(parsed, input, trainingLink, `Revised with OpenAI model: ${selectedModel}`);
+  } catch (error) {
+    return fallbackRevision(input, currentEmail, trainingLink, changeRequest, `OpenAI revision error: ${error.message}`);
   }
 }
 
@@ -245,8 +330,44 @@ function fallbackEmail(input, trainingLink, note) {
   };
 }
 
+function fallbackRevision(input, currentEmail, trainingLink, changeRequest, note) {
+  const organization = input.organization || "the organization";
+  const sender = currentEmail.senderName || input.senderRole || "Internal Communications";
+  const request = String(changeRequest || "").toLowerCase();
+  const wantsFriendly = request.includes("friendly") || request.includes("warmer") || request.includes("softer");
+  const wantsUrgent = request.includes("urgent") || request.includes("stronger") || request.includes("direct");
+  const wantsShorter = request.includes("short") || request.includes("concise") || request.includes("brief");
+  const scenario = input.scenarioContext || "an internal policy update";
+  const lead = wantsFriendly
+    ? "Quick update: we softened the wording while keeping this as a safe awareness exercise."
+    : wantsUrgent
+      ? "Please review this updated training notice as soon as possible."
+      : "Please review this updated internal training notice.";
+  const subject = wantsFriendly
+    ? `${organization}: Friendly reminder about ${scenario}`
+    : wantsUrgent
+      ? `${organization}: Updated action requested for ${scenario}`
+      : `Updated: ${currentEmail.subject || `${organization}: ${scenario}`}`;
+  const body = wantsShorter
+    ? `${lead}\n\nThis revised draft is for ${input.targetProfile || "employees"} in ${input.department || "your department"} and keeps the training link safe.\n\nTraining link: ${trainingLink.url}\n\nThank you,\n${sender}`
+    : `${lead}\n\nRequested change: ${changeRequest}\n\nThis authorized awareness exercise remains tailored for ${input.targetProfile || "employees"} in ${input.department || "your department"}. The scenario is based on ${scenario}. Use the safe training page below to review the indicators in the message.\n\nTraining link: ${trainingLink.url}\n\nThank you,\n${sender}`;
+  const callToAction = wantsFriendly
+    ? `Take a quick look at the safe training page when you can: ${trainingLink.url}`
+    : wantsUrgent
+      ? `Open the safe training page now and complete the updated review: ${trainingLink.url}`
+      : `Review the updated safe training page: ${trainingLink.url}`;
+
+  return {
+    subject,
+    senderName: sender,
+    body,
+    callToAction,
+    generationNote: note,
+  };
+}
+
 function getPromptTemplate(tone, intensity) {
   return promptTemplates[tone]?.[intensity] || promptTemplates.professional.medium;
 }
 
-module.exports = { generateEmail, resolveOpenAIModel, selectModel, getPromptTemplate };
+module.exports = { generateEmail, reviseEmail, resolveOpenAIModel, selectModel, getPromptTemplate };
