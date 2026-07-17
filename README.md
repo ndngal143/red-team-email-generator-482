@@ -32,8 +32,8 @@ Generated links should be training/demo links, not credential-harvesting pages. 
 | ☑ | 6/15–6/19 | Milestone 1: Requirements, Architecture, and Project Setup |
 | ☑ | 6/22–6/26 | Milestone 2: Form Design, Data Model, and Safety Controls |
 | ☑ | 6/29–7/3 | Milestone 3: Email Generation Engine and Spam Indicator Checks |
-| ☐ | 7/6–7/10 | Milestone 4: Link Generator, Logging, and Storage |
-| ☐ | 7/13–7/17 | Milestone 5: Full Integration, Testing, and Defensive Dataset Export |
+| ☑ | 7/6–7/10 | Milestone 4: Link Generator, Logging, and Storage |
+| ☑ | 7/13–7/17 | Milestone 5: Full Integration, Testing, and Defensive Dataset Export |
 | ☐ | 7/20–7/24 | Milestone 6: Polish, Deployment, Documentation, and Demo Prep |
 | ☐ | 7/27–7/28 | Final Presentation and Demonstration |
 
@@ -89,7 +89,7 @@ Generated links should be training/demo links, not credential-harvesting pages. 
 
 | Completion | Member | Subtask | Outputs | Measurement |
 |---------|---------|---------|---------|---------|
-| ☐ | Joyce | Define internal-looking URL patterns | Spoof training URLs | Make the included training links more believable to increase the likelyhood that they will be clicked. |
+| ☑ | Joyce | Define internal-looking URL patterns | Spoof training URLs | Make the included training links more believable to increase the likelyhood that they will be clicked. |
 | ☑ | Sebastian | Implement link generator | Function/API that generates training URLs based on department and scenario | Generated links contain safe demo domains or local routes; no real credential capture URLs are produced |
 | ☑ | Alex | Implement email logging | Log storage, generated email history view, exportable records | Every generation creates a log entry; logs can be viewed and exported as CSV or JSON |
 
@@ -103,9 +103,9 @@ Generated links should be training/demo links, not credential-harvesting pages. 
 
 | Completion | Member | Subtask | Outputs | Measurement |
 |---------|---------|---------|---------|---------|
-| ☐ | Joyce | Conduct user workflow testing | Test cases, user feedback notes, revised UI checklist | At least 10 test scenarios covering different departments, tones, and intensity levels |
-| ☐ | Sebastian | Integrate frontend, backend, generator, link generator, and logging | Working end-to-end application | User can submit form, generate email, receive spam check results, get generated URL, and see log entry |
-| ☐ | Alex | Create defensive dataset export | CSV/JSON export format with labeled generated emails | Export includes email body, subject, tone, intensity, scenario, spam indicators, and generated link metadata |
+| ☑ | Joyce | Conduct user workflow testing | Test cases, user feedback notes, revised UI checklist | At least 10 test scenarios covering different departments, tones, and intensity levels |
+| ☑ | Sebastian | Integrate frontend, backend, generator, link generator, and logging | Working end-to-end application | User can submit form, generate email, receive spam check results, get generated URL, and see log entry |
+| ☑ | Alex | Create defensive dataset export | CSV/JSON export format with labeled generated emails | Export includes email body, subject, tone, intensity, scenario, spam indicators, and generated link metadata |
 
 ---
 
