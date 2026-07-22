@@ -34,7 +34,7 @@ Generated links should be training/demo links, not credential-harvesting pages. 
 | ☑ | 6/29–7/3 | Milestone 3: Email Generation Engine and Spam Indicator Checks |
 | ☑ | 7/6–7/10 | Milestone 4: Link Generator, Logging, and Storage |
 | ☑ | 7/13–7/17 | Milestone 5: Full Integration, Testing, and Defensive Dataset Export |
-| ☐ | 7/20–7/24 | Milestone 6: Polish, Deployment, Documentation, and Demo Prep |
+| ☑ | 7/20–7/24 | Milestone 6: Polish, Deployment, Documentation, and Demo Prep |
 | ☐ | 7/27–7/28 | Final Presentation and Demonstration |
 
 ---
@@ -117,9 +117,9 @@ Generated links should be training/demo links, not credential-harvesting pages. 
 
 | Completion | Member | Subtask | Outputs | Measurement |
 |---------|---------|---------|---------|---------|
-| ☐ | Joyce | Polish UI and prepare demo script | Final UI revisions, demo walkthrough script | Demo script covers form input, email generation, spam check, URL generation, and log export |
-| ☐ | Sebastian | Prepare deployment or local demo environment | Deployed app or reliable local demo setup | App runs consistently on demo machine; setup time under 5 minutes |
-| ☐ | Alex | Write final documentation and presentation content | Final README, project report sections, presentation slides outline | Documentation explains purpose, setup, features, safety limits, architecture, and testing results |
+| ☑ | Joyce | Polish UI and prepare demo script | Final UI revisions, demo walkthrough script | Demo script covers form input, email generation, spam check, URL generation, and log export |
+| ☑ | Sebastian | Prepare deployment or local demo environment | Deployed app or reliable local demo setup | App runs consistently on demo machine; setup time under 5 minutes |
+| ☑ | Alex | Write final documentation and presentation content | Final README, project report sections, presentation slides outline | Documentation explains purpose, setup, features, safety limits, architecture, and testing results |
 
 ---
 
